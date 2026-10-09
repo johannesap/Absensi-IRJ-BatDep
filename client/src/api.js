@@ -19,7 +19,8 @@ export async function api(path, { method = 'GET', body } = {}) {
     session.clear();
     location.href = '/login';
   }
-  if (!res.ok) throw new Error(data.message || 'Terjadi kesalahan, coba lagi');
+  // Tanpa `message` + status 5xx = API mati / tidak terjangkau (proxy Vite membalas 500 kosong)
+  if (!res.ok) throw new Error(data.message || (res.status >= 500 ? 'Server tidak dapat dihubungi, coba lagi nanti' : 'Terjadi kesalahan, coba lagi'));
   return data;
 }
 
