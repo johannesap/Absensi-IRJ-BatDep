@@ -1,0 +1,9 @@
+{
+  "name": "absensi-pd",
+  "private": true,
+  "scripts": {
+    "dev": "node dev.js",
+    "build": "npm run build --prefix client",
+    "start": "npm start --prefix server"
+  }
+}

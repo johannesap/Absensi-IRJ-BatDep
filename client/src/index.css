@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+@theme {
+  /* Cokelat + emas, di atas netral gading (stone) */
+  --color-brown-50: #faf4ec;
+  --color-brown-100: #f0e2cf;
+  --color-brown-600: #8a5a2b;
+  --color-brown-700: #6f4520;
+  --color-brown-800: #4f3017;
+  --color-gold-100: #f6ecd2;
+  --color-gold-400: #d4a843;
+  --color-gold-600: #a67c1e;
+
+  /* Hanya transform + opacity → dikerjakan GPU, ringan di HP RAM 4GB */
+  --animate-enter: enter 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  @keyframes enter {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 16px, 0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-enter {
+    animation: none;
+  }
+}
+
+body {
+  @apply bg-stone-50 text-stone-800 antialiased;
+}
