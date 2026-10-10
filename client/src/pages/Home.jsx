@@ -11,6 +11,27 @@ const FIELDS = [
 ];
 const EMPTY = { nama: '', npm: '', kelas: '', kakakKomsel: '' };
 
+// Layar sambutan ±3 detik; ketuk untuk lewati. Dilewati jika pengguna memilih kurangi gerakan.
+function Welcome() {
+  const [show, setShow] = useState(() => !matchMedia('(prefers-reduced-motion: reduce)').matches);
+  useEffect(() => {
+    const t = setTimeout(() => setShow(false), 3200);
+    return () => clearTimeout(t);
+  }, []);
+  if (!show) return null;
+  return (
+    <div aria-hidden="true" onClick={() => setShow(false)} className="welcome fixed inset-0 z-50 flex cursor-pointer flex-col items-center justify-center bg-brown-800 px-6 text-center text-white">
+      <Cross className="cross-draw h-14 w-10 text-gold-400" />
+      <p className="mt-6 text-lg text-gold-100 sm:text-xl">
+        {['Selamat', 'Datang', 'di'].map((w, i) => <span key={w} className="word" style={{ '--i': i }}>{w}&nbsp;</span>)}
+      </p>
+      <h2 className="word mt-2 text-3xl font-semibold tracking-tight sm:text-5xl" style={{ '--i': 3 }}>Ibadah Raya Jumat</h2>
+      <span className="welcome-line mt-5 block h-0.5 w-24 bg-gold-400" />
+      <p className="word mt-4 text-sm font-medium uppercase tracking-[0.3em] text-gold-400 sm:text-base" style={{ '--i': 5 }}>Area Depok</p>
+    </div>
+  );
+}
+
 export function validate(form) {
   const errors = {};
   for (const { name, label } of FIELDS) if (!form[name].trim()) errors[name] = `${label} wajib diisi`;
@@ -55,6 +76,7 @@ export default function Home() {
 
   return (
     <main className="min-h-dvh px-4 py-10 sm:py-16">
+      <Welcome />
       <div className="mx-auto max-w-md">
         <header className="animate-enter text-center">
           <Cross className="mx-auto mb-4 h-10 w-7 text-gold-400" />
