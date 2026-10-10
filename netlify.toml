@@ -1,8 +1,10 @@
 # Frontend + API dalam satu situs Netlify: API berjalan sebagai Netlify Function (server/functions/api.js)
+# base ditulis eksplisit: situs ini dibuat dengan Base directory "client", jadi semua path relatif ke client/
 [build]
-  command = "npm ci --prefix server && npm ci --prefix client && npm run build --prefix client"
-  publish = "client/dist"
-  functions = "server/functions"
+  base = "client"
+  command = "npm ci --prefix ../server && npm ci && npm run build"
+  publish = "dist"
+  functions = "../server/functions"
 
 [[redirects]]
   from = "/api/*"
