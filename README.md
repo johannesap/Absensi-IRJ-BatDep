@@ -13,7 +13,9 @@ client/                 React + Vite + Tailwind v4
       Dashboard.jsx     Tabel kehadiran, cari nama/NPM, filter tanggal
       Admin.jsx         CRUD akun User Pendataan
 server/                 Express 5 + Mongoose
-  index.js              App, error handler, seed admin pertama
+  app.js                App Express, error handler, koneksi DB + seed admin pertama
+  index.js              Jalankan server lokal / Render
+  functions/api.js      Pembungkus app untuk Netlify Function
   routes.js             Semua endpoint API
   middleware/auth.js    Verifikasi JWT + cek role
   models/               User (role admin|pendataan), Attendance
@@ -52,13 +54,15 @@ Production: `cd client && npm run build`, lalu `cd server && npm start`. Express
 
 Satu NPM hanya bisa absen sekali per hari (zona waktu WIB).
 
-## Deploy ke Netlify + Render
+## Deploy ke Netlify (tanpa kartu kredit)
 
-Frontend di-host di Netlify, API di Render, dan database di MongoDB Atlas.
+Frontend dan API berjalan di satu situs Netlify: API dijalankan sebagai Netlify Function ([server/functions/api.js](./server/functions/api.js)), database di MongoDB Atlas. Tidak perlu CORS maupun `VITE_API_URL`.
 
-1. Buat database di MongoDB Atlas. Izinkan koneksi dari Render (misalnya dengan network access `0.0.0.0/0`) dan salin connection string sebagai `MONGO_URI`.
-2. Hubungkan repository ke Render menggunakan [render.yaml](./render.yaml). Isi `MONGO_URI`, `ADMIN_USERNAME`, dan `ADMIN_PASSWORD` saat diminta. `JWT_SECRET` dibuat otomatis. Setelah situs Netlify dibuat, set `CORS_ORIGINS` ke URL situsnya, misalnya `https://nama-situs.netlify.app`.
-3. Deploy frontend di Netlify menggunakan [netlify.toml](./netlify.toml). Set environment variable `VITE_API_URL` ke URL service Render tanpa garis miring di akhir, misalnya `https://absensi-pd-api.onrender.com`, lalu deploy ulang.
-4. Pastikan `https://<url-render>/health` memberi status `200`, lalu uji form absensi dan login petugas melalui URL Netlify.
+1. MongoDB Atlas: Network Access harus berisi `0.0.0.0/0` (IP Netlify berubah-ubah).
+2. Netlify: **Add new site → Import an existing project → GitHub**, pilih repo ini. Pengaturan build dibaca otomatis dari [netlify.toml](./netlify.toml).
+3. Di **Site configuration → Environment variables**, isi `MONGO_URI`, `JWT_SECRET` (string acak panjang), `ADMIN_USERNAME`, `ADMIN_PASSWORD`, lalu **Deploys → Trigger deploy**.
+4. Uji form absensi dan login petugas lewat URL Netlify.
+
+Alternatif: [render.yaml](./render.yaml) masih bisa dipakai untuk menjalankan API di Render (`node index.js`), tapi Render kini meminta kartu kredit. Jika memakai Render, set `CORS_ORIGINS` ke URL frontend dan `VITE_API_URL` ke URL Render.
 
 Jangan simpan nilai rahasia MongoDB atau kredensial admin ke repository. Akun admin pertama dibuat otomatis saat API terhubung ke database yang belum memiliki admin.
