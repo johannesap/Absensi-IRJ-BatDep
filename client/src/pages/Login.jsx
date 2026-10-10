@@ -46,9 +46,18 @@ export default function Login() {
         <div className="rise" style={{ '--i': 3 }}>
           <Field id="password" name="password" label="Password" type="password" autoComplete="current-password" required value={form.password} onChange={onChange} />
         </div>
+        {/* ponytail: akun uji coba ditampilkan untuk masa testing — hapus blok ini dan akun "penguji" sebelum dipakai resmi */}
+        <div className="rise flex items-center justify-between gap-3 rounded-lg bg-gold-100/60 px-3 py-2.5 text-sm ring-1 ring-gold-400/40" style={{ '--i': 4 }}>
+          <p className="text-brown-800">
+            Akun uji coba: <b className="font-semibold">penguji</b> / <b className="font-semibold">uji12345</b>
+          </p>
+          <button type="button" onClick={() => setForm({ username: 'penguji', password: 'uji12345' })} className="shrink-0 font-medium text-brown-700 hover:underline">
+            Isi
+          </button>
+        </div>
         <Alert>{error}</Alert>
-        <button disabled={loading} className={`rise ${btnPrimary} w-full`} style={{ '--i': 4 }}>{loading ? 'Memproses…' : 'Masuk'}</button>
-        <Link to="/" className="rise block text-center text-sm text-stone-500 hover:text-stone-700" style={{ '--i': 5 }}>← Kembali ke form absensi</Link>
+        <button disabled={loading} className={`rise ${btnPrimary} w-full`} style={{ '--i': 5 }}>{loading ? 'Memproses…' : 'Masuk'}</button>
+        <Link to="/" className="rise block text-center text-sm text-stone-500 hover:text-stone-700" style={{ '--i': 6 }}>← Kembali ke form absensi</Link>
       </form>
     </main>
   );
