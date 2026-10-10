@@ -66,3 +66,12 @@ Frontend dan API berjalan di satu situs Netlify: API dijalankan sebagai Netlify 
 Alternatif: [render.yaml](./render.yaml) masih bisa dipakai untuk menjalankan API di Render (`node index.js`), tapi Render kini meminta kartu kredit. Jika memakai Render, set `CORS_ORIGINS` ke URL frontend dan `VITE_API_URL` ke URL Render.
 
 Jangan simpan nilai rahasia MongoDB atau kredensial admin ke repository. Akun admin pertama dibuat otomatis saat API terhubung ke database yang belum memiliki admin.
+
+## Deploy frontend dan API ke Vercel
+
+Vercel juga dapat menjalankan frontend dan API dalam satu project. Function [api/[...path].js](./api/[...path].js) menggunakan Express yang sama; browser memanggil `/api` pada domain Vercel, jadi `VITE_API_URL` tidak perlu diatur.
+
+1. Import repository ke Vercel dengan project root di direktori repository. Build dan instalasi sudah dikonfigurasi di [vercel.json](./vercel.json).
+2. Tambahkan environment variables untuk Production: `MONGO_URI`, `JWT_SECRET`, `ADMIN_USERNAME`, dan `ADMIN_PASSWORD`. Gunakan rahasia kuat dan jangan simpan nilainya di repository.
+3. Pastikan IP access list MongoDB Atlas mengizinkan koneksi dari Vercel. Setelah deploy, uji `https://<domain-vercel>/api/health`; status `200` menandakan API berhasil terhubung ke MongoDB.
+4. Akun admin dibuat otomatis saat API pertama kali terhubung ke database yang belum memiliki admin. Login menggunakan nilai `ADMIN_USERNAME` dan `ADMIN_PASSWORD` yang ditetapkan di Vercel.

@@ -29,7 +29,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/health', (_req, res) => {
+app.get(['/health', '/api/health'], (_req, res) => {
   res.status(mongoose.connection.readyState === 1 ? 200 : 503).json({ status: 'ok' });
 });
 
