@@ -21,6 +21,9 @@
   }
 }
 
+/* Tombol "mata" bawaan Edge disembunyikan; Field sudah punya tombol lihat password sendiri */
+input::-ms-reveal { display: none; }
+
 /* Entrance halaman login: cahaya → kartu → garis emas → salib → isi form bertahap */
 .login-glow {
   background: radial-gradient(circle, var(--color-gold-100) 0%, transparent 65%);

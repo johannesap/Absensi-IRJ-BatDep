@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router';
 import { session } from '../api';
 
@@ -9,17 +10,38 @@ export const btnPrimary =
 
 export const btnGhost = 'rounded-lg px-3 py-1.5 text-sm text-stone-700 ring-1 ring-stone-300 transition-colors hover:bg-stone-100';
 
-export function Field({ label, error, id, ...props }) {
+export function Field({ label, error, id, type, ...props }) {
+  const [show, setShow] = useState(false);
+  const isPassword = type === 'password';
   return (
     <div>
       <label htmlFor={id} className="mb-1.5 block text-sm font-medium text-stone-700">{label}</label>
-      <input
-        id={id}
-        className={`${inputCls} ${error ? 'border-red-500' : 'border-stone-300'}`}
-        aria-invalid={!!error}
-        aria-describedby={error ? `${id}-err` : undefined}
-        {...props}
-      />
+      <div className="relative">
+        <input
+          id={id}
+          type={isPassword && show ? 'text' : type}
+          className={`${inputCls} ${isPassword ? 'pr-12' : ''} ${error ? 'border-red-500' : 'border-stone-300'}`}
+          aria-invalid={!!error}
+          aria-describedby={error ? `${id}-err` : undefined}
+          {...props}
+        />
+        {isPassword && (
+          <button
+            type="button"
+            onClick={() => setShow(!show)}
+            aria-label={show ? 'Sembunyikan password' : 'Lihat password'}
+            title={show ? 'Sembunyikan password' : 'Lihat password'}
+            aria-pressed={show}
+            className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-lg text-stone-500 hover:text-stone-800 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brown-700"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
+              <circle cx="12" cy="12" r="3" />
+              {show && <path d="M3 3l18 18" />}
+            </svg>
+          </button>
+        )}
+      </div>
       {error && <p id={`${id}-err`} className="mt-1 text-sm text-red-600">{error}</p>}
     </div>
   );
