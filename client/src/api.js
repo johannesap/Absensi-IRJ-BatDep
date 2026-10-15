@@ -32,9 +32,3 @@ export async function api(path, { method = 'GET', body } = {}) {
 }
 
 export const todayWIB = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
-
-export const formatWIB = (date) =>
-  new Date(date).toLocaleString('id-ID', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-    hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta',
-  }) + ' WIB';

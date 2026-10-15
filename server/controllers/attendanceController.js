@@ -8,6 +8,10 @@ export const todayWIB = () => new Date().toLocaleDateString('en-CA', { timeZone:
 
 export const create = async (req, res) => {
   const { nama, npm, kelas, kakakKomsel, whatsapp, ulangTahun } = req.body ?? {};
+  // Batas 13 digit berlaku untuk nomor seperti yang diketik, sebelum dinormalisasi ke 62… oleh model
+  if (whatsapp && !/^\d{1,13}$/.test(String(whatsapp))) {
+    return res.status(400).json({ message: 'Nomor WhatsApp hanya boleh angka, maksimal 13 digit' });
+  }
   // Tanggal selalu diisi server, bukan dari client
   if (await Attendance.exists({ npm: String(npm ?? '').trim(), tanggal: { $gte: startOfDayWIB(todayWIB()) } })) {
     return res.status(409).json({ message: 'NPM ini sudah tercatat hadir hari ini' });

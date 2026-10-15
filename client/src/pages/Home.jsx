@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
-import { api, formatWIB } from '../api';
+import { api } from '../api';
 import { Alert, Cross, Field, btnGhost, btnPrimary, inputCls } from '../components/ui';
 
 const FIELDS = [
   { name: 'nama', label: 'Nama Lengkap', placeholder: 'cth. Yohanes Saputra', autoComplete: 'name' },
-  { name: 'npm', label: 'NPM', placeholder: '8 digit angka', inputMode: 'numeric', maxLength: 8 },
-  { name: 'kelas', label: 'Kelas', placeholder: 'cth. 3IA01' },
+  { name: 'npm', label: 'NPM', placeholder: '8 digit angka', inputMode: 'numeric' },
+  { name: 'kelas', label: 'Kelas', placeholder: 'cth. 3IA01', maxLength: 5 },
   { name: 'kakakKomsel', label: 'Kakak Komsel', placeholder: 'Nama kakak komsel' },
-  { name: 'whatsapp', label: 'Nomor WhatsApp', placeholder: 'cth. 081234567890', type: 'tel', inputMode: 'tel', autoComplete: 'tel' },
+  { name: 'whatsapp', label: 'Nomor WhatsApp', placeholder: 'cth. 081234567890', type: 'tel', inputMode: 'numeric', autoComplete: 'tel' },
 ];
+// Kolom angka saja: selain angka dibuang saat diketik/ditempel, lalu dipotong ke panjang maksimal.
+// (Bukan maxLength: maxLength memotong teks tempelan seperti "0812 3456 7890" sebelum spasinya dibuang.)
+const DIGITS = { npm: 8, whatsapp: 13 };
 const EMPTY = { nama: '', npm: '', kelas: '', kakakKomsel: '', whatsapp: '', lahirHari: '', lahirBulan: '' };
 const HARI = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
 const BULAN = Array.from({ length: 12 }, (_, i) => new Date(2000, i, 1).toLocaleDateString('id-ID', { month: 'long' }));
@@ -50,8 +53,8 @@ export function validate(form) {
   const errors = {};
   for (const { name, label } of FIELDS) if (!form[name].trim()) errors[name] = `${label} wajib diisi`;
   if (form.npm.trim() && !/^\d{8}$/.test(form.npm.trim())) errors.npm = 'NPM harus 8 digit angka';
-  // Sama dengan normalisasi di server (models/Attendance.js)
-  if (form.whatsapp.trim() && !/^628\d{7,11}$/.test(form.whatsapp.replace(/\D/g, '').replace(/^0/, '62'))) {
+  // Sama dengan normalisasi di server (models/Attendance.js); input sudah angka saja, maks. 13 digit
+  if (form.whatsapp && !/^628\d{7,11}$/.test(form.whatsapp.replace(/^0/, '62'))) {
     errors.whatsapp = 'Nomor WhatsApp tidak valid (cth. 081234567890)';
   }
   const { lahirHari: d, lahirBulan: m } = form;
@@ -72,7 +75,7 @@ function Doa({ entry, onDone }) {
     setError('');
     try {
       await api(`/attendance/${entry.id}/doa`, { method: 'POST', body: { npm: entry.npm, doa } });
-      onDone('Terima kasih, dukungan doamu sudah kami terima dan akan didoakan bersama. Tuhan Yesus memberkati.');
+      onDone(true);
     } catch (err) {
       setError(err.message);
       setSending(false);
@@ -97,15 +100,42 @@ function Doa({ entry, onDone }) {
       <Alert>{error}</Alert>
       <div className="flex gap-2">
         <button disabled={sending || !doa.trim()} className={`${btnPrimary} flex-1`}>{sending ? 'Mengirim…' : 'Kirim Dukungan Doa'}</button>
-        <button type="button" onClick={() => onDone()} className={btnGhost}>Lewati</button>
+        <button type="button" onClick={() => onDone(false)} className={btnGhost}>Lewati</button>
       </div>
     </form>
+  );
+}
+
+// Layar terima kasih setelah dukungan doa dikirim/dilewati; ±5 detik (atau diketuk) lalu kembali ke layar sambutan.
+// Gaya & animasi kata sama dengan Welcome, jadi pergantian ke layar sambutan tidak berkedip.
+function Thanks({ nama, sent, onDone }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 5000);
+    return () => clearTimeout(t);
+  }, []);
+  return (
+    <div role="status" onClick={onDone} className="fixed inset-0 z-50 flex cursor-pointer flex-col items-center justify-center bg-brown-800 px-6 text-center text-white">
+      <Cross className="cross-draw h-14 w-10 text-gold-400" />
+      <h2 className="mt-6 text-4xl font-semibold tracking-tight sm:text-5xl">
+        {['Terima', 'kasih'].map((w, i) => <span key={w} className="word" style={{ '--i': i }}>{w}&nbsp;</span>)}
+      </h2>
+      <p className="word mt-3 text-xl text-gold-100 sm:text-2xl" style={{ '--i': 2 }}>{nama}</p>
+      <span className="welcome-line mt-5 block h-0.5 w-24 bg-gold-400" />
+      <p className="word mt-4 max-w-sm text-gold-100" style={{ '--i': 4 }}>
+        {sent ? 'Dukungan doamu sudah kami terima dan akan didoakan bersama.' : 'Kehadiranmu sudah tercatat.'}
+      </p>
+      <p className="word mt-4 text-sm font-medium uppercase tracking-[0.3em] text-gold-400 sm:text-base" style={{ '--i': 6 }}>
+        Tuhan Yesus memberkati
+      </p>
+    </div>
   );
 }
 
 export default function Home() {
   const [form, setForm] = useState(EMPTY);
   const [submitted, setSubmitted] = useState(null); // absensi yang baru tercatat → tampilkan kolom dukungan doa
+  const [thanks, setThanks] = useState(null); // { nama, sent } → layar terima kasih
+  const [round, setRound] = useState(0); // naik → Welcome dipasang ulang, jadi layar sambutan tampil lagi
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -117,8 +147,10 @@ export default function Home() {
   }, []);
 
   const onChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name.startsWith('lahir') ? 'lahir' : e.target.name]: undefined });
+    const { name } = e.target;
+    const value = DIGITS[name] ? e.target.value.replace(/\D/g, '').slice(0, DIGITS[name]) : e.target.value;
+    setForm({ ...form, [name]: value });
+    setErrors({ ...errors, [name.startsWith('lahir') ? 'lahir' : name]: undefined });
   };
 
   const lahirProps = {
@@ -149,7 +181,8 @@ export default function Home() {
 
   return (
     <main className="min-h-dvh px-4 pt-10 pb-24 sm:pt-16">
-      <Welcome />
+      <Welcome key={round} />
+      {thanks && <Thanks {...thanks} onDone={() => { setThanks(null); setRound((r) => r + 1); }} />}
       <div className="mx-auto max-w-md">
         <header className="animate-enter text-center">
           <Cross className="mx-auto mb-4 h-10 w-7 text-gold-400" />
@@ -164,7 +197,7 @@ export default function Home() {
         </header>
 
         {submitted ? (
-          <Doa entry={submitted} onDone={(msg) => { setSubmitted(null); setStatus(msg ? { type: 'success', msg } : null); }} />
+          <Doa entry={submitted} onDone={(sent) => { setThanks({ nama: submitted.nama, sent }); setSubmitted(null); setStatus(null); }} />
         ) : (
         <form
           noValidate
@@ -191,7 +224,15 @@ export default function Home() {
             </div>
             {errors.lahir && <p id="lahir-err" className="mt-1 text-sm text-red-600">{errors.lahir}</p>}
           </fieldset>
-          <Field id="tanggal" label="Tanggal Kehadiran" value={formatWIB(now)} readOnly />
+          <div>
+            <p className="mb-1.5 text-sm font-medium text-stone-700">Tanggal Kehadiran</p>
+            <p className="rounded-lg border border-stone-300 bg-stone-100 px-3 py-2.5 text-stone-600">
+              {now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}
+              <span className="block text-xs text-stone-500">
+                Pukul {now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB
+              </span>
+            </p>
+          </div>
           <p className="text-xs text-stone-500">
             Data ini hanya digunakan untuk pelayanan Persekutuan Doa Universitas Gunadarma dan hanya dapat dilihat oleh pengurus.
           </p>
