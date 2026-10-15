@@ -11,6 +11,7 @@ r.put('/auth/password', auth('penggembalaan'), changePassword);
 
 r.post('/attendance', attendance.create); // publik
 r.get('/attendance', auth('penggembalaan', 'admin'), attendance.list);
+r.get('/attendance/count', auth('penggembalaan', 'admin'), attendance.count);
 r.delete('/attendance/:id', auth('penggembalaan', 'admin'), attendance.remove);
 
 r.get('/users', auth('admin'), users.list);

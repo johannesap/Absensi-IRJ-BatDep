@@ -16,20 +16,32 @@ export const create = async (req, res) => {
   res.status(201).json(doc);
 };
 
+// Filter rentang satu hari WIB dari ?date=YYYY-MM-DD; false = format salah
+const dateFilter = (date) => {
+  if (!date) return {};
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return false;
+  const start = startOfDayWIB(date);
+  return { tanggal: { $gte: start, $lt: new Date(start.getTime() + DAY) } };
+};
+const badDate = (res) => res.status(400).json({ message: 'Format tanggal tidak valid' });
+
 export const list = async (req, res) => {
   const { q, date } = req.query;
-  const filter = {};
+  const filter = dateFilter(date);
+  if (!filter) return badDate(res);
   if (q) {
     const rx = new RegExp(String(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
     filter.$or = [{ nama: rx }, { npm: rx }];
   }
-  if (date) {
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return res.status(400).json({ message: 'Format tanggal tidak valid' });
-    const start = startOfDayWIB(date);
-    filter.tanggal = { $gte: start, $lt: new Date(start.getTime() + DAY) };
-  }
   // ponytail: dibatasi 1000 baris tanpa paginasi; tambahkan paginasi jika data per filter melebihi itu
   res.json(await Attendance.find(filter).sort({ tanggal: -1 }).limit(1000));
+};
+
+// Total hadir per tanggal, tidak terpengaruh pencarian maupun batas 1000 baris
+export const count = async (req, res) => {
+  const filter = dateFilter(req.query.date);
+  if (!filter) return badDate(res);
+  res.json({ count: await Attendance.countDocuments(filter) });
 };
 
 export const remove = async (req, res) => {

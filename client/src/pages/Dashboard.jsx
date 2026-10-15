@@ -6,21 +6,26 @@ export default function Dashboard() {
   const [q, setQ] = useState('');
   const [date, setDate] = useState(todayWIB);
   const [rows, setRows] = useState([]);
+  const [total, setTotal] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const load = () => {
-    setLoading(true);
-    const params = new URLSearchParams({ q, date });
-    return api(`/attendance?${params}`)
-      .then((data) => { setRows(data); setError(''); })
+  // silent: refresh otomatis di latar, tanpa menampilkan "Memuat…"
+  const load = (silent) => {
+    if (!silent) setLoading(true);
+    return Promise.all([
+      api(`/attendance?${new URLSearchParams({ q, date })}`),
+      api(`/attendance/count?${new URLSearchParams({ date })}`),
+    ])
+      .then(([data, { count }]) => { setRows(data); setTotal(count); setError(''); })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => {
     const t = setTimeout(load, 300); // debounce ketikan pencarian
-    return () => clearTimeout(t);
+    const timer = setInterval(() => !document.hidden && load(true), 15000);
+    return () => { clearTimeout(t); clearInterval(timer); };
   }, [q, date]);
 
   async function remove(row) {
@@ -28,6 +33,7 @@ export default function Dashboard() {
     try {
       await api(`/attendance/${row._id}`, { method: 'DELETE' });
       setRows(rows.filter((r) => r._id !== row._id));
+      setTotal((n) => n - 1);
     } catch (err) {
       setError(err.message);
     }
@@ -35,6 +41,18 @@ export default function Dashboard() {
 
   return (
     <Shell title="Data Kehadiran">
+      <section aria-live="polite" className="mb-4 rounded-xl bg-white p-4 ring-1 ring-stone-200">
+        <p className="text-sm text-stone-500">
+          Hadir · {date
+            ? new Date(`${date}T00:00:00+07:00`).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })
+            : 'semua tanggal'}
+        </p>
+        <p className="mt-1 text-brown-800">
+          <span className="text-4xl font-semibold tabular-nums">{total ?? '–'}</span> mahasiswa
+        </p>
+        <p className="mt-1 text-xs text-stone-400">Diperbarui otomatis setiap 15 detik</p>
+      </section>
+
       <div className="flex flex-col gap-3 sm:flex-row">
         <input type="search" placeholder="Cari nama atau NPM…" aria-label="Cari nama atau NPM" value={q} onChange={(e) => setQ(e.target.value)} className={`${inputCls} border-stone-300`} />
         <input type="date" aria-label="Filter tanggal" value={date} onChange={(e) => setDate(e.target.value)} className={`${inputCls} border-stone-300 sm:w-48`} />
@@ -42,7 +60,7 @@ export default function Dashboard() {
       </div>
 
       <div className="mt-4 flex items-center justify-between text-sm text-stone-500">
-        <span>{loading ? 'Memuat…' : `${rows.length} mahasiswa hadir`}</span>
+        <span>{loading ? 'Memuat…' : q && `${rows.length} hasil pencarian`}</span>
       </div>
       <div className="mt-2"><Alert>{error}</Alert></div>
 
