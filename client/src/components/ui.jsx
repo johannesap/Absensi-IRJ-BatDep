@@ -23,6 +23,16 @@ export function Field({ label, error, id, type, ...props }) {
           className={`${inputCls} ${isPassword ? 'pr-12' : ''} ${error ? 'border-red-500' : 'border-stone-300'}`}
           aria-invalid={!!error}
           aria-describedby={error ? `${id}-err` : undefined}
+          // Pesan validasi bawaan browser mengikuti bahasa browser (sering Inggris), jadi diganti bahasa Indonesia
+          onInvalid={(e) => {
+            const { validity, value, minLength } = e.target;
+            e.target.setCustomValidity(
+              validity.valueMissing ? 'Kolom ini wajib diisi.'
+                : validity.tooShort ? `Minimal ${minLength} karakter (sekarang ${value.length} karakter).`
+                : '',
+            );
+          }}
+          onInput={(e) => e.target.setCustomValidity('')}
           {...props}
         />
         {isPassword && (
