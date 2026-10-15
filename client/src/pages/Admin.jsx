@@ -59,8 +59,8 @@ export default function Admin() {
           <Field id="name" name="name" label="Nama" required value={form.name} onChange={onChange} />
           <Field id="username" name="username" label="Username" required autoComplete="off" value={form.username} onChange={onChange} />
           <Field
-            id="password" name="password" type="password" autoComplete="new-password" minLength={6}
-            label={editId ? 'Password baru (kosongkan jika tidak diubah)' : 'Password'}
+            id="password" name="password" type="password" autoComplete="new-password" minLength={10}
+            label={editId ? 'Password baru (min. 10 karakter, kosongkan jika tidak diubah)' : 'Password (min. 10 karakter)'}
             required={!editId} value={form.password} onChange={onChange}
           />
           <Alert type={msg?.type}>{msg?.text}</Alert>

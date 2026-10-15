@@ -31,7 +31,7 @@ export default function Password() {
     <Shell title="Ganti Password">
       <form onSubmit={onSubmit} className="mx-auto max-w-sm space-y-4 rounded-xl bg-white p-5 ring-1 ring-stone-200">
         <Field id="oldPassword" name="oldPassword" type="password" label="Password lama" autoComplete="current-password" required value={form.oldPassword} onChange={onChange} />
-        <Field id="newPassword" name="newPassword" type="password" label="Password baru" autoComplete="new-password" minLength={6} required value={form.newPassword} onChange={onChange} />
+        <Field id="newPassword" name="newPassword" type="password" label="Password baru (min. 10 karakter)" autoComplete="new-password" minLength={10} required value={form.newPassword} onChange={onChange} />
         <Field id="confirm" name="confirm" type="password" label="Ulangi password baru" autoComplete="new-password" required value={form.confirm} onChange={onChange} />
         <Alert type={msg?.type}>{msg?.text}</Alert>
         <button disabled={saving} className={`${btnPrimary} w-full`}>{saving ? 'Menyimpan…' : 'Simpan'}</button>

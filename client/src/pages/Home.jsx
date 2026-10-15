@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { api, formatWIB } from '../api';
-import { Alert, Cross, Field, btnPrimary } from '../components/ui';
+import { Alert, Cross, Field, btnPrimary, inputCls } from '../components/ui';
 
 const FIELDS = [
   { name: 'nama', label: 'Nama Lengkap', placeholder: 'cth. Yohanes Saputra', autoComplete: 'name' },
@@ -10,7 +10,9 @@ const FIELDS = [
   { name: 'kakakKomsel', label: 'Kakak Komsel', placeholder: 'Nama kakak komsel' },
   { name: 'whatsapp', label: 'Nomor WhatsApp', placeholder: 'cth. 081234567890', type: 'tel', inputMode: 'tel', autoComplete: 'tel' },
 ];
-const EMPTY = { nama: '', npm: '', kelas: '', kakakKomsel: '', whatsapp: '' };
+const EMPTY = { nama: '', npm: '', kelas: '', kakakKomsel: '', whatsapp: '', lahirHari: '', lahirBulan: '' };
+const HARI = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
+const BULAN = Array.from({ length: 12 }, (_, i) => new Date(2000, i, 1).toLocaleDateString('id-ID', { month: 'long' }));
 
 // Layar sambutan ±3 detik; ketuk untuk lewati. Dilewati jika pengguna memilih kurangi gerakan.
 function Welcome() {
@@ -41,6 +43,9 @@ export function validate(form) {
   if (form.whatsapp.trim() && !/^628\d{7,11}$/.test(form.whatsapp.replace(/\D/g, '').replace(/^0/, '62'))) {
     errors.whatsapp = 'Nomor WhatsApp tidak valid (cth. 081234567890)';
   }
+  const { lahirHari: d, lahirBulan: m } = form;
+  if (!d !== !m) errors.lahir = 'Pilih tanggal dan bulan, atau kosongkan keduanya';
+  else if (d && new Date(2000, m - 1, d).getMonth() !== m - 1) errors.lahir = 'Tanggal itu tidak ada di bulan tersebut';
   return errors;
 }
 
@@ -58,7 +63,14 @@ export default function Home() {
 
   const onChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: undefined });
+    setErrors({ ...errors, [e.target.name.startsWith('lahir') ? 'lahir' : e.target.name]: undefined });
+  };
+
+  const lahirProps = {
+    onChange,
+    'aria-invalid': !!errors.lahir,
+    'aria-describedby': errors.lahir ? 'lahir-err' : undefined,
+    className: `${inputCls} ${errors.lahir ? 'border-red-500' : 'border-stone-300'}`,
   };
 
   async function onSubmit(e) {
@@ -69,7 +81,8 @@ export default function Home() {
     if (Object.keys(errs).length) return;
     setLoading(true);
     try {
-      await api('/attendance', { method: 'POST', body: form });
+      const { lahirHari, lahirBulan, ...rest } = form;
+      await api('/attendance', { method: 'POST', body: { ...rest, ulangTahun: lahirHari ? `${lahirBulan}-${lahirHari}` : undefined } });
       setStatus({ type: 'success', msg: `Terima kasih, ${form.nama.trim()}! Kehadiranmu sudah tercatat. Tuhan Yesus memberkati.` });
       setForm(EMPTY);
     } catch (err) {
@@ -104,7 +117,26 @@ export default function Home() {
           {FIELDS.map((f) => (
             <Field key={f.name} id={f.name} {...f} value={form[f.name]} error={errors[f.name]} onChange={onChange} />
           ))}
+          <fieldset>
+            <legend className="mb-1.5 block text-sm font-medium text-stone-700">
+              Tanggal Ulang Tahun <span className="font-normal text-stone-400">(opsional, tanpa tahun)</span>
+            </legend>
+            <div className="grid grid-cols-[6rem_1fr] gap-2">
+              <select name="lahirHari" aria-label="Tanggal" value={form.lahirHari} {...lahirProps}>
+                <option value="">Tgl</option>
+                {HARI.map((h) => <option key={h} value={h}>{+h}</option>)}
+              </select>
+              <select name="lahirBulan" aria-label="Bulan" value={form.lahirBulan} {...lahirProps}>
+                <option value="">Bulan</option>
+                {BULAN.map((b, i) => <option key={b} value={String(i + 1).padStart(2, '0')}>{b}</option>)}
+              </select>
+            </div>
+            {errors.lahir && <p id="lahir-err" className="mt-1 text-sm text-red-600">{errors.lahir}</p>}
+          </fieldset>
           <Field id="tanggal" label="Tanggal Kehadiran" value={formatWIB(now)} readOnly />
+          <p className="text-xs text-stone-500">
+            Data ini hanya digunakan untuk pelayanan Persekutuan Doa Universitas Gunadarma dan hanya dapat dilihat oleh pengurus.
+          </p>
           <Alert type={status?.type}>{status?.msg}</Alert>
           <button type="submit" disabled={loading} className={`${btnPrimary} w-full`}>
             {loading ? 'Mengirim…' : 'Kirim Kehadiran'}
