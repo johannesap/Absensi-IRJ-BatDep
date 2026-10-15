@@ -144,7 +144,7 @@ export default function Home() {
         </form>
 
         <p className="animate-enter mt-6 text-center text-sm text-stone-500" style={{ animationDelay: '240ms' }}>
-          Petugas? <Link to="/login" className="font-medium text-brown-700 hover:underline">Masuk di sini</Link>
+          Pengurus? <Link to="/login" className="font-medium text-brown-700 hover:underline">Masuk di sini</Link>
         </p>
       </div>
     </main>

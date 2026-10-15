@@ -38,7 +38,7 @@ export default function Login() {
         <span aria-hidden="true" className="login-sweep absolute inset-x-0 top-0 h-1 bg-gold-400" />
         <div>
           <Cross className="cross-draw mb-3 h-8 w-6 text-gold-400" />
-          <h1 className="rise text-xl font-semibold text-brown-800" style={{ '--i': 0 }}>Masuk Petugas</h1>
+          <h1 className="rise text-xl font-semibold text-brown-800" style={{ '--i': 0 }}>Masuk Pengurus</h1>
           <p className="rise mt-1 text-sm text-stone-500" style={{ '--i': 1 }}>Untuk Admin dan User Penggembalaan.</p>
         </div>
         <div className="rise" style={{ '--i': 2 }}>
