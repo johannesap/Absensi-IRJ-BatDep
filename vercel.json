@@ -3,6 +3,12 @@
   "buildCommand": "npm run build",
   "outputDirectory": "client/dist",
   "regions": ["sin1"],
+  "crons": [
+    {
+      "path": "/api/health",
+      "schedule": "0 1 * * 1"
+    }
+  ],
   "functions": {
     "api/index.mjs": {
       "maxDuration": 30

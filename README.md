@@ -78,3 +78,4 @@ Vercel juga dapat menjalankan frontend dan API dalam satu project. Function [api
 2. Tambahkan environment variables untuk Production: `MONGO_URI`, `JWT_SECRET`, `ADMIN_USERNAME`, dan `ADMIN_PASSWORD`. Gunakan rahasia kuat dan jangan simpan nilainya di repository.
 3. Pastikan IP access list MongoDB Atlas mengizinkan koneksi dari Vercel. Setelah deploy, uji `https://<domain-vercel>/api/health`; status `200` menandakan API berhasil terhubung ke MongoDB.
 4. Akun admin dibuat otomatis saat API pertama kali terhubung ke database yang belum memiliki admin. Login menggunakan nilai `ADMIN_USERNAME` dan `ADMIN_PASSWORD` yang ditetapkan di Vercel.
+5. Vercel Cron di [vercel.json](./vercel.json) memanggil `/api/health` setiap Senin 08.00 WIB. Panggilan ini membuka koneksi ke MongoDB, sehingga cluster Atlas gratis tidak di-pause otomatis karena 30 hari tanpa koneksi (misalnya saat libur semester).
