@@ -2,6 +2,7 @@
 
 ```
 client/                 React + Vite + Tailwind v4
+  public/praise.mp3     Lagu latar halaman absensi (diputar pada klik pertama, tombol Jeda/Putar)
   src/
     main.jsx            Router + guard role (Protected)
     api.js              fetch wrapper, sesi JWT, helper tanggal WIB
