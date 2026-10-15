@@ -17,6 +17,9 @@ export async function api(path, { method = 'GET', body } = {}) {
     method,
     headers: { 'Content-Type': 'application/json', ...(s && { Authorization: `Bearer ${s.token}` }) },
     body: body && JSON.stringify(body),
+  }).catch(() => {
+    // fetch hanya gagal begini jika browser tidak bisa menghubungi situs sama sekali (internet putus, server lokal mati)
+    throw new Error('Tidak dapat terhubung ke server. Periksa koneksi internet, lalu coba lagi.');
   });
   const data = await res.json().catch(() => ({}));
   if (res.status === 401 && s) {
