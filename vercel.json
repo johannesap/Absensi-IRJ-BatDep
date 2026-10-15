@@ -3,11 +3,15 @@
   "buildCommand": "npm run build",
   "outputDirectory": "client/dist",
   "functions": {
-    "api/[...path].js": {
+    "api/index.mjs": {
       "maxDuration": 30
     }
   },
   "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api"
+    },
     {
       "source": "/((?!api/).*)",
       "destination": "/index.html"

@@ -69,7 +69,7 @@ Jangan simpan nilai rahasia MongoDB atau kredensial admin ke repository. Akun ad
 
 ## Deploy frontend dan API ke Vercel
 
-Vercel juga dapat menjalankan frontend dan API dalam satu project. Function [api/[...path].js](./api/[...path].js) menggunakan Express yang sama; browser memanggil `/api` pada domain Vercel, jadi `VITE_API_URL` tidak perlu diatur.
+Vercel juga dapat menjalankan frontend dan API dalam satu project. Function [api/index.mjs](./api/index.mjs) menggunakan Express yang sama (semua `/api/*` di-rewrite ke sana; `.mjs` agar tidak diubah Vercel ke CommonJS); browser memanggil `/api` pada domain Vercel, jadi `VITE_API_URL` tidak perlu diatur.
 
 1. Import repository ke Vercel dengan project root di direktori repository. Build dan instalasi sudah dikonfigurasi di [vercel.json](./vercel.json).
 2. Tambahkan environment variables untuk Production: `MONGO_URI`, `JWT_SECRET`, `ADMIN_USERNAME`, dan `ADMIN_PASSWORD`. Gunakan rahasia kuat dan jangan simpan nilainya di repository.
