@@ -56,6 +56,8 @@ let connecting;
 export function connectDB() {
   connecting ??= (async () => {
     await mongoose.connect(process.env.MONGO_URI);
+    // ponytail: migrasi nama role lama "pendataan"; boleh dihapus setelah sekali berjalan di production
+    await User.updateMany({ role: 'pendataan' }, { role: 'penggembalaan' });
     if (!(await User.exists({ role: 'admin' }))) {
       await User.create({ username: process.env.ADMIN_USERNAME, password: process.env.ADMIN_PASSWORD, name: 'Administrator', role: 'admin' });
       console.log(`Admin awal dibuat: ${process.env.ADMIN_USERNAME}`);

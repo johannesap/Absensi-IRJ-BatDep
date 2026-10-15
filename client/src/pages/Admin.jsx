@@ -52,7 +52,7 @@ export default function Admin() {
   }
 
   return (
-    <Shell title="Manajemen Akun Pendataan">
+    <Shell title="Manajemen Akun Penggembalaan">
       <div className="grid gap-6 lg:grid-cols-[320px_1fr]">
         <form onSubmit={onSubmit} className="h-fit space-y-4 rounded-xl bg-white p-5 ring-1 ring-stone-200">
           <h2 className="font-semibold text-stone-900">{editId ? 'Edit Akun' : 'Tambah Akun'}</h2>
@@ -83,7 +83,7 @@ export default function Admin() {
               </div>
             </li>
           ))}
-          {!users.length && <li className="px-4 py-10 text-center text-stone-500">Belum ada akun pendataan.</li>}
+          {!users.length && <li className="px-4 py-10 text-center text-stone-500">Belum ada akun penggembalaan.</li>}
         </ul>
       </div>
     </Shell>

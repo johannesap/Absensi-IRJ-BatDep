@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
-// Usage: auth('admin') or auth('pendataan', 'admin')
+// Usage: auth('admin') or auth('penggembalaan', 'admin')
 export const auth = (...roles) => async (req, res, next) => {
   let payload;
   try {

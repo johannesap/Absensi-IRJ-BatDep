@@ -59,7 +59,7 @@ export function Shell({ title, children }) {
           <nav className="flex items-center gap-2 text-sm">
             {s.role === 'admin' && (
               <>
-                <NavLink to="/pendataan" className={tab}>Kehadiran</NavLink>
+                <NavLink to="/penggembalaan" className={tab}>Kehadiran</NavLink>
                 <NavLink to="/admin" className={tab}>Akun</NavLink>
               </>
             )}

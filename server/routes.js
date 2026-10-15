@@ -9,8 +9,8 @@ const r = Router();
 r.post('/auth/login', login);
 
 r.post('/attendance', attendance.create); // publik
-r.get('/attendance', auth('pendataan', 'admin'), attendance.list);
-r.delete('/attendance/:id', auth('pendataan', 'admin'), attendance.remove);
+r.get('/attendance', auth('penggembalaan', 'admin'), attendance.list);
+r.delete('/attendance/:id', auth('penggembalaan', 'admin'), attendance.remove);
 
 r.get('/users', auth('admin'), users.list);
 r.post('/users', auth('admin'), users.create);

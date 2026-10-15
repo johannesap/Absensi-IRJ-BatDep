@@ -19,7 +19,7 @@ createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/pendataan" element={<Protected roles={['pendataan', 'admin']}><Dashboard /></Protected>} />
+        <Route path="/penggembalaan" element={<Protected roles={['penggembalaan', 'admin']}><Dashboard /></Protected>} />
         <Route path="/admin" element={<Protected roles={['admin']}><Admin /></Protected>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

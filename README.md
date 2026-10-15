@@ -11,14 +11,14 @@ client/                 React + Vite + Tailwind v4
       Home.jsx          Form absensi publik (tanggal otomatis, read-only)
       Login.jsx         Login petugas → diarahkan sesuai role
       Dashboard.jsx     Tabel kehadiran, cari nama/NPM, filter tanggal
-      Admin.jsx         CRUD akun User Pendataan
+      Admin.jsx         CRUD akun User Penggembalaan
 server/                 Express 5 + Mongoose
   app.js                App Express, error handler, koneksi DB + seed admin pertama
   index.js              Jalankan server lokal / Render
   functions/api.js      Pembungkus app untuk Netlify Function
   routes.js             Semua endpoint API
   middleware/auth.js    Verifikasi JWT + cek role
-  models/               User (role admin|pendataan), Attendance
+  models/               User (role admin|penggembalaan), Attendance
   controllers/          auth, attendance, user
 ```
 
@@ -28,8 +28,8 @@ server/                 Express 5 + Mongoose
 |--------|-----------------------|--------------------|
 | POST   | /api/auth/login       | publik             |
 | POST   | /api/attendance       | publik             |
-| GET    | /api/attendance?q=&date=YYYY-MM-DD | pendataan, admin |
-| DELETE | /api/attendance/:id   | pendataan, admin   |
+| GET    | /api/attendance?q=&date=YYYY-MM-DD | penggembalaan, admin |
+| DELETE | /api/attendance/:id   | penggembalaan, admin   |
 | GET/POST | /api/users          | admin              |
 | PUT/DELETE | /api/users/:id    | admin              |
 

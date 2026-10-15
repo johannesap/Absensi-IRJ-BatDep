@@ -3,7 +3,7 @@ import { Link, Navigate, useNavigate } from 'react-router';
 import { api, session } from '../api';
 import { Alert, Cross, Field, btnPrimary } from '../components/ui';
 
-const home = (role) => (role === 'admin' ? '/admin' : '/pendataan');
+const home = (role) => (role === 'admin' ? '/admin' : '/penggembalaan');
 
 export default function Login() {
   const navigate = useNavigate();
@@ -12,7 +12,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const s = session.get();
-  if (s) return <Navigate to={home(s.role)} replace />;
+  // Sesi lama ber-role "pendataan" diabaikan, kalau tidak akan redirect bolak-balik dengan /penggembalaan
+  if (s && ['admin', 'penggembalaan'].includes(s.role)) return <Navigate to={home(s.role)} replace />;
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -38,7 +39,7 @@ export default function Login() {
         <div>
           <Cross className="cross-draw mb-3 h-8 w-6 text-gold-400" />
           <h1 className="rise text-xl font-semibold text-brown-800" style={{ '--i': 0 }}>Masuk Petugas</h1>
-          <p className="rise mt-1 text-sm text-stone-500" style={{ '--i': 1 }}>Untuk Admin dan User Pendataan.</p>
+          <p className="rise mt-1 text-sm text-stone-500" style={{ '--i': 1 }}>Untuk Admin dan User Penggembalaan.</p>
         </div>
         <div className="rise" style={{ '--i': 2 }}>
           <Field id="username" name="username" label="Username" autoComplete="username" required value={form.username} onChange={onChange} />
