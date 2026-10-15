@@ -1,10 +1,14 @@
+// sessionStorage dihapus browser saat tab/browser ditutup, jadi user otomatis keluar dari akun
 export const session = {
   get: () => {
-    try { return JSON.parse(localStorage.getItem('session')); } catch { return null; }
+    try { return JSON.parse(sessionStorage.getItem('session')); } catch { return null; }
   },
-  set: (s) => localStorage.setItem('session', JSON.stringify(s)),
-  clear: () => localStorage.removeItem('session'),
+  set: (s) => sessionStorage.setItem('session', JSON.stringify(s)),
+  clear: () => sessionStorage.removeItem('session'),
 };
+
+// ponytail: buang sesi lama dari versi yang masih memakai localStorage; boleh dihapus setelah beberapa minggu
+try { localStorage.removeItem('session'); } catch { /* storage diblokir */ }
 
 export async function api(path, { method = 'GET', body } = {}) {
   const s = session.get();
