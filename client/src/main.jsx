@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Admin from './pages/Admin';
 import Password from './pages/Password';
+import Backsound from './components/Backsound';
 
 function Protected({ roles, children }) {
   const s = session.get();
@@ -25,6 +26,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/password" element={<Protected roles={['penggembalaan']}><Password /></Protected>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Backsound />
     </BrowserRouter>
   </StrictMode>
 );

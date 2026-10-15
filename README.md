@@ -2,12 +2,13 @@
 
 ```
 client/                 React + Vite + Tailwind v4
-  public/praise.mp3     Lagu latar halaman absensi (diputar pada klik pertama, tombol Jeda/Putar)
+  public/praise.mp3     Lagu latar (diputar pada klik pertama di halaman absensi, lanjut ke halaman login/pengurus)
   src/
     main.jsx            Router + guard role (Protected)
     api.js              fetch wrapper, sesi JWT, helper tanggal WIB
     index.css           Tailwind + animasi masuk (transform/opacity saja)
     components/ui.jsx   Field, Alert, Shell (header halaman petugas)
+    components/Backsound.jsx  Pemutar lagu latar + tombol Jeda/Putar, di luar <Routes> agar tidak berhenti saat pindah halaman
     pages/
       Home.jsx          Form absensi publik (tanggal otomatis, read-only)
       Login.jsx         Login petugas → diarahkan sesuai role
