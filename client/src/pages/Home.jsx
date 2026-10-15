@@ -106,8 +106,8 @@ function Doa({ entry, onDone }) {
   );
 }
 
-// Layar terima kasih setelah dukungan doa dikirim/dilewati; ±5 detik (atau diketuk) lalu kembali ke layar sambutan.
-// Gaya & animasi kata sama dengan Welcome, jadi pergantian ke layar sambutan tidak berkedip.
+// Layar terima kasih setelah dukungan doa dikirim/dilewati; ±5 detik (atau diketuk) lalu halaman dimuat ulang.
+// Warnanya sama dengan Welcome, jadi pergantian ke layar sambutan tidak berkedip.
 function Thanks({ nama, sent, onDone }) {
   useEffect(() => {
     const t = setTimeout(onDone, 5000);
@@ -135,7 +135,6 @@ export default function Home() {
   const [form, setForm] = useState(EMPTY);
   const [submitted, setSubmitted] = useState(null); // absensi yang baru tercatat → tampilkan kolom dukungan doa
   const [thanks, setThanks] = useState(null); // { nama, sent } → layar terima kasih
-  const [round, setRound] = useState(0); // naik → Welcome dipasang ulang, jadi layar sambutan tampil lagi
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -181,8 +180,10 @@ export default function Home() {
 
   return (
     <main className="min-h-dvh px-4 pt-10 pb-24 sm:pt-16">
-      <Welcome key={round} />
-      {thanks && <Thanks {...thanks} onDone={() => { setThanks(null); setRound((r) => r + 1); }} />}
+      <Welcome />
+      {/* Muat ulang = persis seperti pertama masuk: layar sambutan, posisi paling atas, lagu mulai lagi saat diketuk */}
+      {/* manual: tanpa ini browser HP mengembalikan posisi gulir lama setelah muat ulang */}
+      {thanks && <Thanks {...thanks} onDone={() => { history.scrollRestoration = 'manual'; location.reload(); }} />}
       <div className="mx-auto max-w-md">
         <header className="animate-enter text-center">
           <Cross className="mx-auto mb-4 h-10 w-7 text-gold-400" />
