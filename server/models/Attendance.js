@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 
 const attendanceSchema = new mongoose.Schema({
-  nama: { type: String, required: [true, 'Nama wajib diisi'], trim: true },
+  nama: { type: String, required: [true, 'Nama wajib diisi'], trim: true, maxlength: [100, 'Nama maksimal 100 karakter'] },
   npm: { type: String, required: [true, 'NPM wajib diisi'], trim: true, match: [/^\d{8}$/, 'NPM harus 8 digit angka'] },
   kelas: { type: String, required: [true, 'Kelas wajib diisi'], trim: true, uppercase: true, maxlength: [5, 'Kelas maksimal 5 karakter'] },
-  kakakKomsel: { type: String, required: [true, 'Kakak Komsel wajib diisi'], trim: true },
+  kakakKomsel: { type: String, required: [true, 'Kakak Komsel wajib diisi'], trim: true, maxlength: [100, 'Kakak Komsel maksimal 100 karakter'] },
   // Masuk sebagai angka saja, maks. 13 digit (dicek di controller); disimpan seragam sebagai 628… ("0812…" → "62812…")
   whatsapp: {
     type: String,

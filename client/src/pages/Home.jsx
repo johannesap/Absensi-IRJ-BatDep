@@ -4,10 +4,10 @@ import { api } from '../api';
 import { Alert, Cross, Field, btnGhost, btnPrimary, inputCls } from '../components/ui';
 
 const FIELDS = [
-  { name: 'nama', label: 'Nama Lengkap', placeholder: 'cth. Yohanes Saputra', autoComplete: 'name' },
+  { name: 'nama', label: 'Nama Lengkap', placeholder: 'cth. Yohanes Saputra', autoComplete: 'name', maxLength: 100 },
   { name: 'npm', label: 'NPM', placeholder: '8 digit angka', inputMode: 'numeric' },
   { name: 'kelas', label: 'Kelas', placeholder: 'cth. 3IA01', maxLength: 5 },
-  { name: 'kakakKomsel', label: 'Kakak Komsel', placeholder: 'Nama kakak komsel' },
+  { name: 'kakakKomsel', label: 'Kakak Komsel', placeholder: 'Nama kakak komsel', maxLength: 100 },
   { name: 'whatsapp', label: 'Nomor WhatsApp', placeholder: 'cth. 081234567890', type: 'tel', inputMode: 'numeric', autoComplete: 'tel' },
 ];
 // Kolom angka saja: selain angka dibuang saat diketik/ditempel, lalu dipotong ke panjang maksimal.
