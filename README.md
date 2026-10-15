@@ -12,6 +12,7 @@ client/                 React + Vite + Tailwind v4
       Login.jsx         Login petugas → diarahkan sesuai role
       Dashboard.jsx     Tabel kehadiran, cari nama/NPM, filter tanggal
       Admin.jsx         CRUD akun User Penggembalaan
+      Password.jsx      Ganti password sendiri (User Penggembalaan)
 server/                 Express 5 + Mongoose
   app.js                App Express, error handler, koneksi DB + seed admin pertama
   index.js              Jalankan server lokal / Render
@@ -27,6 +28,7 @@ server/                 Express 5 + Mongoose
 | Method | Endpoint              | Akses              |
 |--------|-----------------------|--------------------|
 | POST   | /api/auth/login       | publik             |
+| PUT    | /api/auth/password    | penggembalaan (wajib password lama) |
 | POST   | /api/attendance       | publik             |
 | GET    | /api/attendance?q=&date=YYYY-MM-DD | penggembalaan, admin |
 | DELETE | /api/attendance/:id   | penggembalaan, admin   |

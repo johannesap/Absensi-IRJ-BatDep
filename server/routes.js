@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { auth } from './middleware/auth.js';
-import { login } from './controllers/authController.js';
+import { changePassword, login } from './controllers/authController.js';
 import * as attendance from './controllers/attendanceController.js';
 import * as users from './controllers/userController.js';
 
 const r = Router();
 
 r.post('/auth/login', login);
+r.put('/auth/password', auth('penggembalaan'), changePassword);
 
 r.post('/attendance', attendance.create); // publik
 r.get('/attendance', auth('penggembalaan', 'admin'), attendance.list);

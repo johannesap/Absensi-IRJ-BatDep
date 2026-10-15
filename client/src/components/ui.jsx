@@ -63,6 +63,12 @@ export function Shell({ title, children }) {
                 <NavLink to="/admin" className={tab}>Akun</NavLink>
               </>
             )}
+            {s.role === 'penggembalaan' && (
+              <>
+                <NavLink to="/penggembalaan" className={tab}>Kehadiran</NavLink>
+                <NavLink to="/password" className={tab}>Ganti Password</NavLink>
+              </>
+            )}
             <span className="hidden px-2 text-brown-100 sm:inline">{s.name}</span>
             <button className="rounded-lg px-3 py-1.5 text-sm ring-1 ring-white/30 transition-colors hover:bg-white/10" onClick={() => { session.clear(); navigate('/login'); }}>Keluar</button>
           </nav>
