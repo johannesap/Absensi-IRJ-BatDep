@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import { api, formatWIB, todayWIB } from '../api';
 import { Alert, Shell, inputCls } from '../components/ui';
 
+// Data lama (sebelum ada kolom WhatsApp) tidak punya nomor
+const Wa = ({ n }) =>
+  n ? <a href={`https://wa.me/${n}`} target="_blank" rel="noreferrer" className="tabular-nums text-brown-700 hover:underline">+{n}</a> : '–';
+
 export default function Dashboard() {
   const [q, setQ] = useState('');
   const [date, setDate] = useState(todayWIB);
@@ -76,6 +80,7 @@ export default function Dashboard() {
               <button onClick={() => remove(r)} className="shrink-0 rounded-lg px-3 py-1.5 text-sm text-red-600 ring-1 ring-red-200 hover:bg-red-50">Hapus</button>
             </div>
             <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 text-sm">
+              <dt className="text-stone-500">WhatsApp</dt><dd><Wa n={r.whatsapp} /></dd>
               <dt className="text-stone-500">Kakak Komsel</dt><dd className="break-words">{r.kakakKomsel}</dd>
               <dt className="text-stone-500">Waktu</dt><dd>{formatWIB(r.tanggal)}</dd>
             </dl>
@@ -88,7 +93,7 @@ export default function Dashboard() {
         <table className="w-full text-left text-sm">
           <thead className="bg-stone-50 text-xs uppercase tracking-wide text-stone-500">
             <tr>
-              {['No', 'Nama', 'NPM', 'Kelas', 'Kakak Komsel', 'Waktu', ''].map((h, i) => <th key={i} className="px-4 py-3 font-medium">{h}</th>)}
+              {['No', 'Nama', 'NPM', 'Kelas', 'WhatsApp', 'Kakak Komsel', 'Waktu', ''].map((h, i) => <th key={i} className="px-4 py-3 font-medium">{h}</th>)}
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100">
@@ -98,6 +103,7 @@ export default function Dashboard() {
                 <td className="px-4 py-3 font-medium text-stone-900">{r.nama}</td>
                 <td className="px-4 py-3 tabular-nums">{r.npm}</td>
                 <td className="px-4 py-3">{r.kelas}</td>
+                <td className="px-4 py-3 whitespace-nowrap"><Wa n={r.whatsapp} /></td>
                 <td className="px-4 py-3">{r.kakakKomsel}</td>
                 <td className="px-4 py-3 whitespace-nowrap text-stone-500">{formatWIB(r.tanggal)}</td>
                 <td className="px-4 py-3 text-right">
@@ -106,7 +112,7 @@ export default function Dashboard() {
               </tr>
             ))}
             {!loading && !rows.length && (
-              <tr><td colSpan={7} className="px-4 py-10 text-center text-stone-500">Belum ada data kehadiran.</td></tr>
+              <tr><td colSpan={8}className="px-4 py-10 text-center text-stone-500">Belum ada data kehadiran.</td></tr>
             )}
           </tbody>
         </table>

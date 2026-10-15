@@ -8,8 +8,9 @@ const FIELDS = [
   { name: 'npm', label: 'NPM', placeholder: '8 digit angka', inputMode: 'numeric', maxLength: 8 },
   { name: 'kelas', label: 'Kelas', placeholder: 'cth. 3IA01' },
   { name: 'kakakKomsel', label: 'Kakak Komsel', placeholder: 'Nama kakak komsel' },
+  { name: 'whatsapp', label: 'Nomor WhatsApp', placeholder: 'cth. 081234567890', type: 'tel', inputMode: 'tel', autoComplete: 'tel' },
 ];
-const EMPTY = { nama: '', npm: '', kelas: '', kakakKomsel: '' };
+const EMPTY = { nama: '', npm: '', kelas: '', kakakKomsel: '', whatsapp: '' };
 
 // Layar sambutan ±3 detik; ketuk untuk lewati. Dilewati jika pengguna memilih kurangi gerakan.
 function Welcome() {
@@ -36,6 +37,10 @@ export function validate(form) {
   const errors = {};
   for (const { name, label } of FIELDS) if (!form[name].trim()) errors[name] = `${label} wajib diisi`;
   if (form.npm.trim() && !/^\d{8}$/.test(form.npm.trim())) errors.npm = 'NPM harus 8 digit angka';
+  // Sama dengan normalisasi di server (models/Attendance.js)
+  if (form.whatsapp.trim() && !/^628\d{7,11}$/.test(form.whatsapp.replace(/\D/g, '').replace(/^0/, '62'))) {
+    errors.whatsapp = 'Nomor WhatsApp tidak valid (cth. 081234567890)';
+  }
   return errors;
 }
 

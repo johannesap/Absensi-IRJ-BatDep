@@ -7,12 +7,12 @@ export const startOfDayWIB = (ymd) => new Date(`${ymd}T00:00:00+07:00`);
 export const todayWIB = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
 
 export const create = async (req, res) => {
-  const { nama, npm, kelas, kakakKomsel } = req.body ?? {};
+  const { nama, npm, kelas, kakakKomsel, whatsapp } = req.body ?? {};
   // Tanggal selalu diisi server, bukan dari client
   if (await Attendance.exists({ npm: String(npm ?? '').trim(), tanggal: { $gte: startOfDayWIB(todayWIB()) } })) {
     return res.status(409).json({ message: 'NPM ini sudah tercatat hadir hari ini' });
   }
-  const doc = await Attendance.create({ nama, npm, kelas, kakakKomsel });
+  const doc = await Attendance.create({ nama, npm, kelas, kakakKomsel, whatsapp });
   res.status(201).json(doc);
 };
 
