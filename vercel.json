@@ -2,6 +2,7 @@
   "installCommand": "npm ci --prefix server && npm ci --prefix client",
   "buildCommand": "npm run build",
   "outputDirectory": "client/dist",
+  "regions": ["sin1"],
   "functions": {
     "api/index.mjs": {
       "maxDuration": 30
