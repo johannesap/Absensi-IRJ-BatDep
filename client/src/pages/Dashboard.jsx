@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { api, todayWIB } from '../api';
-import { Alert, Shell, inputCls } from '../components/ui';
+import { Alert, Shell, btnGhost, inputCls } from '../components/ui';
+
+const PER_PAGE = 5;
 
 // Data lama (sebelum ada kolom WhatsApp) tidak punya nomor
 const Wa = ({ n }) =>
@@ -33,6 +35,12 @@ export default function Dashboard() {
   const [total, setTotal] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+
+  // Dibatasi ke halaman terakhir yang ada, karena data bisa berkurang setelah hapus/refresh otomatis
+  const pages = Math.max(1, Math.ceil(rows.length / PER_PAGE));
+  const p = Math.min(page, pages - 1);
+  const shown = rows.slice(p * PER_PAGE, (p + 1) * PER_PAGE);
 
   // silent: refresh otomatis di latar, tanpa menampilkan "Memuat…"
   const load = (silent) => {
@@ -47,6 +55,7 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
+    setPage(0);
     const t = setTimeout(load, 300); // debounce ketikan pencarian
     const timer = setInterval(() => !document.hidden && load(true), 15000);
     return () => { clearTimeout(t); clearInterval(timer); };
@@ -90,11 +99,11 @@ export default function Dashboard() {
 
       {/* HP: kartu per mahasiswa, tanpa geser ke samping */}
       <ul className="mt-2 space-y-2 md:hidden">
-        {rows.map((r, i) => (
+        {shown.map((r, i) => (
           <li key={r._id} className="rounded-xl bg-white p-4 ring-1 ring-stone-200">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="break-words font-medium text-stone-900">{i + 1}. {r.nama}</p>
+                <p className="break-words font-medium text-stone-900">{p * PER_PAGE + i + 1}. {r.nama}</p>
                 <p className="text-sm tabular-nums text-stone-500">{r.npm} · {r.kelas}</p>
               </div>
               <button onClick={() => remove(r)} className="shrink-0 rounded-lg px-3 py-1.5 text-sm text-red-600 ring-1 ring-red-200 hover:bg-red-50">Hapus</button>
@@ -119,9 +128,9 @@ export default function Dashboard() {
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100">
-            {rows.map((r, i) => (
+            {shown.map((r, i) => (
               <tr key={r._id} className="hover:bg-stone-50">
-                <td className="px-4 py-3 text-stone-400">{i + 1}</td>
+                <td className="px-4 py-3 text-stone-400">{p * PER_PAGE + i + 1}</td>
                 <td className="px-4 py-3 font-medium text-stone-900">{r.nama}</td>
                 <td className="px-4 py-3 tabular-nums">{r.npm}</td>
                 <td className="px-4 py-3">{r.kelas}</td>
@@ -136,11 +145,19 @@ export default function Dashboard() {
               </tr>
             ))}
             {!loading && !rows.length && (
-              <tr><td colSpan={10}className="px-4 py-10 text-center text-stone-500">Belum ada data kehadiran.</td></tr>
+              <tr><td colSpan={10} className="px-4 py-10 text-center text-stone-500">Belum ada data kehadiran.</td></tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {pages > 1 && (
+        <nav aria-label="Halaman data kehadiran" className="mt-3 flex items-center justify-center gap-3 text-sm">
+          <button onClick={() => setPage(p - 1)} disabled={p === 0} className={`${btnGhost} disabled:opacity-40`}>‹ Sebelumnya</button>
+          <span className="tabular-nums text-stone-500">Halaman {p + 1} dari {pages}</span>
+          <button onClick={() => setPage(p + 1)} disabled={p === pages - 1} className={`${btnGhost} disabled:opacity-40`}>Berikutnya ›</button>
+        </nav>
+      )}
     </Shell>
   );
 }
