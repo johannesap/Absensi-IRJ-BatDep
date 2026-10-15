@@ -35,6 +35,33 @@ function Welcome() {
   );
 }
 
+// ponytail: video lirik tidak resmi (kanal AKARUI WORSHIP); kalau dihapus YouTube, ganti ID ini dengan video lain
+const SONG = 'LNPwyLH2crA'; // PRAISE (the Lord oh my soul) – Elevation Worship
+
+// Browser memblokir suara sebelum pengunjung mengetuk halaman, jadi pemutar (autoplay) baru dipasang pada ketukan pertama.
+// YouTube mewajibkan pemutar terlihat (min. 200×200), jadi tidak disembunyikan.
+function Backsound() {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const start = () => setOn(true);
+    window.addEventListener('pointerdown', start, { once: true });
+    window.addEventListener('keydown', start, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', start);
+      window.removeEventListener('keydown', start);
+    };
+  }, []);
+  if (!on) return null;
+  return (
+    <iframe
+      title="Lagu latar: Praise – Elevation Worship"
+      src={`https://www.youtube-nocookie.com/embed/${SONG}?autoplay=1&loop=1&playlist=${SONG}`}
+      allow="autoplay; encrypted-media"
+      className="mt-6 aspect-video min-h-[200px] w-full rounded-xl ring-1 ring-stone-200"
+    />
+  );
+}
+
 export function validate(form) {
   const errors = {};
   for (const { name, label } of FIELDS) if (!form[name].trim()) errors[name] = `${label} wajib diisi`;
@@ -146,6 +173,7 @@ export default function Home() {
         <p className="animate-enter mt-6 text-center text-sm text-stone-500" style={{ animationDelay: '240ms' }}>
           Pengurus? <Link to="/login" className="font-medium text-brown-700 hover:underline">Masuk di sini</Link>
         </p>
+        <Backsound />
       </div>
     </main>
   );
