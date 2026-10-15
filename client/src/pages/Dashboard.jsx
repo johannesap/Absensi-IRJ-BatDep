@@ -10,8 +10,15 @@ const Wa = ({ n }) =>
 const ultah = (v) =>
   v ? new Date(2000, v.slice(0, 2) - 1, v.slice(3)).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' }) : '–';
 
-// Tanggal saja (tanpa jam), mis. "15 Oktober 2026"
-const tanggal = (d) => new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' });
+// "15 Oktober 2026" dengan jam ("20.33 WIB") kecil di bawahnya
+const TanggalJam = ({ d }) => (
+  <>
+    {new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' })}
+    <span className="block text-xs text-stone-400">
+      {new Date(d).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' })} WIB
+    </span>
+  </>
+);
 
 const DoaText =({ text, className = '' }) => (
   <p className={`whitespace-pre-line break-words rounded-lg bg-gold-100/50 px-3 py-2 text-sm text-stone-700 ${className}`}>
@@ -96,7 +103,7 @@ export default function Dashboard() {
               <dt className="text-stone-500">WhatsApp</dt><dd><Wa n={r.whatsapp} /></dd>
               <dt className="text-stone-500">Ulang Tahun</dt><dd>{ultah(r.ulangTahun)}</dd>
               <dt className="text-stone-500">Kakak Komsel</dt><dd className="break-words">{r.kakakKomsel}</dd>
-              <dt className="text-stone-500">Tanggal</dt><dd>{tanggal(r.tanggal)}</dd>
+              <dt className="text-stone-500">Tanggal</dt><dd><TanggalJam d={r.tanggal} /></dd>
             </dl>
             {r.dukunganDoa && <DoaText text={r.dukunganDoa} className="mt-3" />}
           </li>
@@ -121,7 +128,7 @@ export default function Dashboard() {
                 <td className="px-4 py-3 whitespace-nowrap"><Wa n={r.whatsapp} /></td>
                 <td className="px-4 py-3 whitespace-nowrap">{ultah(r.ulangTahun)}</td>
                 <td className="px-4 py-3">{r.kakakKomsel}</td>
-                <td className="px-4 py-3 whitespace-nowrap text-stone-500">{tanggal(r.tanggal)}</td>
+                <td className="px-4 py-3 whitespace-nowrap text-stone-500"><TanggalJam d={r.tanggal} /></td>
                 <td className="min-w-44 max-w-xs px-4 py-3 whitespace-pre-line break-words">{r.dukunganDoa || '–'}</td>
                 <td className="px-4 py-3 text-right">
                   <button onClick={() => remove(r)} className="text-red-600 hover:underline">Hapus</button>
