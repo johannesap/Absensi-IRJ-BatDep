@@ -80,7 +80,7 @@ export function Shell({ title, children }) {
   return (
     <div className="min-h-dvh">
       <header className="border-b-2 border-gold-400 bg-brown-800 text-white">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-3">
             <Cross className="h-7 w-5 text-gold-400" />
             <div>
@@ -106,7 +106,8 @@ export function Shell({ title, children }) {
           </nav>
         </div>
       </header>
-      <main className="mx-auto max-w-5xl px-4 py-6">{children}</main>
+      {/* 7xl: tabel kehadiran punya 10 kolom */}
+      <main className="mx-auto max-w-7xl px-4 py-6">{children}</main>
     </div>
   );
 }

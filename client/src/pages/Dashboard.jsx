@@ -1,5 +1,5 @@
-import { Fragment, useEffect, useState } from 'react';
-import { api, formatWIB, todayWIB } from '../api';
+import { useEffect, useState } from 'react';
+import { api, todayWIB } from '../api';
 import { Alert, Shell, inputCls } from '../components/ui';
 
 // Data lama (sebelum ada kolom WhatsApp) tidak punya nomor
@@ -10,7 +10,10 @@ const Wa = ({ n }) =>
 const ultah = (v) =>
   v ? new Date(2000, v.slice(0, 2) - 1, v.slice(3)).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' }) : '–';
 
-const DoaText = ({ text, className = '' }) => (
+// Tanggal saja (tanpa jam), mis. "15 Oktober 2026"
+const tanggal = (d) => new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' });
+
+const DoaText =({ text, className = '' }) => (
   <p className={`whitespace-pre-line break-words rounded-lg bg-gold-100/50 px-3 py-2 text-sm text-stone-700 ${className}`}>
     <span className="font-medium text-brown-800">Dukungan doa: </span>{text}
   </p>
@@ -93,7 +96,7 @@ export default function Dashboard() {
               <dt className="text-stone-500">WhatsApp</dt><dd><Wa n={r.whatsapp} /></dd>
               <dt className="text-stone-500">Ulang Tahun</dt><dd>{ultah(r.ulangTahun)}</dd>
               <dt className="text-stone-500">Kakak Komsel</dt><dd className="break-words">{r.kakakKomsel}</dd>
-              <dt className="text-stone-500">Waktu</dt><dd>{formatWIB(r.tanggal)}</dd>
+              <dt className="text-stone-500">Tanggal</dt><dd>{tanggal(r.tanggal)}</dd>
             </dl>
             {r.dukunganDoa && <DoaText text={r.dukunganDoa} className="mt-3" />}
           </li>
@@ -105,13 +108,12 @@ export default function Dashboard() {
         <table className="w-full text-left text-sm">
           <thead className="bg-stone-50 text-xs uppercase tracking-wide text-stone-500">
             <tr>
-              {['No', 'Nama', 'NPM', 'Kelas', 'WhatsApp', 'Ulang Tahun', 'Kakak Komsel', 'Waktu', ''].map((h, i) => <th key={i} className="px-4 py-3 font-medium">{h}</th>)}
+              {['No', 'Nama', 'NPM', 'Kelas', 'WhatsApp', 'Ulang Tahun', 'Kakak Komsel', 'Tanggal', 'Dukungan Doa', ''].map((h, i) => <th key={i} className="px-4 py-3 font-medium">{h}</th>)}
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100">
             {rows.map((r, i) => (
-              <Fragment key={r._id}>
-              <tr className={`hover:bg-stone-50 ${r.dukunganDoa ? 'border-b-0' : ''}`}>
+              <tr key={r._id} className="hover:bg-stone-50">
                 <td className="px-4 py-3 text-stone-400">{i + 1}</td>
                 <td className="px-4 py-3 font-medium text-stone-900">{r.nama}</td>
                 <td className="px-4 py-3 tabular-nums">{r.npm}</td>
@@ -119,21 +121,15 @@ export default function Dashboard() {
                 <td className="px-4 py-3 whitespace-nowrap"><Wa n={r.whatsapp} /></td>
                 <td className="px-4 py-3 whitespace-nowrap">{ultah(r.ulangTahun)}</td>
                 <td className="px-4 py-3">{r.kakakKomsel}</td>
-                <td className="px-4 py-3 whitespace-nowrap text-stone-500">{formatWIB(r.tanggal)}</td>
+                <td className="px-4 py-3 whitespace-nowrap text-stone-500">{tanggal(r.tanggal)}</td>
+                <td className="min-w-44 max-w-xs px-4 py-3 whitespace-pre-line break-words">{r.dukunganDoa || '–'}</td>
                 <td className="px-4 py-3 text-right">
                   <button onClick={() => remove(r)} className="text-red-600 hover:underline">Hapus</button>
                 </td>
               </tr>
-              {r.dukunganDoa && (
-                <tr>
-                  <td />
-                  <td colSpan={8} className="px-4 pb-3"><DoaText text={r.dukunganDoa} /></td>
-                </tr>
-              )}
-              </Fragment>
             ))}
             {!loading && !rows.length && (
-              <tr><td colSpan={9} className="px-4 py-10 text-center text-stone-500">Belum ada data kehadiran.</td></tr>
+              <tr><td colSpan={10}className="px-4 py-10 text-center text-stone-500">Belum ada data kehadiran.</td></tr>
             )}
           </tbody>
         </table>
