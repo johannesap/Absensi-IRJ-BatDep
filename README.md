@@ -32,6 +32,7 @@ server/                 Express 5 + Mongoose
 | POST   | /api/auth/login       | publik             |
 | PUT    | /api/auth/password    | penggembalaan (wajib password lama) |
 | POST   | /api/attendance       | publik             |
+| POST   | /api/attendance/:id/doa | publik (NPM harus cocok, sekali, hari yang sama) |
 | GET    | /api/attendance?q=&date=YYYY-MM-DD | penggembalaan, admin |
 | GET    | /api/attendance/count?date=YYYY-MM-DD | penggembalaan, admin |
 | DELETE | /api/attendance/:id   | penggembalaan, admin   |

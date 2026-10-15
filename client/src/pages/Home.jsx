@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { api, formatWIB } from '../api';
-import { Alert, Cross, Field, btnPrimary, inputCls } from '../components/ui';
+import { Alert, Cross, Field, btnGhost, btnPrimary, inputCls } from '../components/ui';
 
 const FIELDS = [
   { name: 'nama', label: 'Nama Lengkap', placeholder: 'cth. Yohanes Saputra', autoComplete: 'name' },
@@ -60,8 +60,52 @@ export function validate(form) {
   return errors;
 }
 
+// Muncul setelah kehadiran tercatat; doa disimpan ke absensi itu (server mencocokkan _id + NPM)
+function Doa({ entry, onDone }) {
+  const [doa, setDoa] = useState('');
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState('');
+
+  async function onSubmit(e) {
+    e.preventDefault();
+    setSending(true);
+    setError('');
+    try {
+      await api(`/attendance/${entry.id}/doa`, { method: 'POST', body: { npm: entry.npm, doa } });
+      onDone('Terima kasih, dukungan doamu sudah kami terima dan akan didoakan bersama. Tuhan Yesus memberkati.');
+    } catch (err) {
+      setError(err.message);
+      setSending(false);
+    }
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="animate-enter mt-8 space-y-4 rounded-2xl border-t-4 border-gold-400 bg-white p-5 shadow-sm ring-1 ring-stone-200 sm:p-6">
+      <Alert type="success">Terima kasih, {entry.nama}! Kehadiranmu sudah tercatat. Tuhan Yesus memberkati.</Alert>
+      <div>
+        <label htmlFor="doa" className="mb-1.5 block text-sm font-medium text-stone-700">
+          Dukungan Doa <span className="font-normal text-stone-400">(opsional)</span>
+        </label>
+        <textarea
+          id="doa" rows={5} maxLength={1000} value={doa} onChange={(e) => setDoa(e.target.value)}
+          placeholder="Tuliskan pokok doa yang ingin didoakan bersama…"
+          aria-describedby="doa-info"
+          className={`${inputCls} border-stone-300`}
+        />
+        <p id="doa-info" className="mt-1 text-xs text-stone-500">Hanya dibaca oleh pengurus untuk didoakan.</p>
+      </div>
+      <Alert>{error}</Alert>
+      <div className="flex gap-2">
+        <button disabled={sending || !doa.trim()} className={`${btnPrimary} flex-1`}>{sending ? 'Mengirim…' : 'Kirim Dukungan Doa'}</button>
+        <button type="button" onClick={() => onDone()} className={btnGhost}>Lewati</button>
+      </div>
+    </form>
+  );
+}
+
 export default function Home() {
   const [form, setForm] = useState(EMPTY);
+  const [submitted, setSubmitted] = useState(null); // absensi yang baru tercatat → tampilkan kolom dukungan doa
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -93,8 +137,8 @@ export default function Home() {
     setLoading(true);
     try {
       const { lahirHari, lahirBulan, ...rest } = form;
-      await api('/attendance', { method: 'POST', body: { ...rest, ulangTahun: lahirHari ? `${lahirBulan}-${lahirHari}` : undefined } });
-      setStatus({ type: 'success', msg: `Terima kasih, ${form.nama.trim()}! Kehadiranmu sudah tercatat. Tuhan Yesus memberkati.` });
+      const doc = await api('/attendance', { method: 'POST', body: { ...rest, ulangTahun: lahirHari ? `${lahirBulan}-${lahirHari}` : undefined } });
+      setSubmitted({ id: doc._id, npm: doc.npm, nama: doc.nama });
       setForm(EMPTY);
     } catch (err) {
       setStatus({ type: 'error', msg: err.message });
@@ -119,6 +163,9 @@ export default function Home() {
           </p>
         </header>
 
+        {submitted ? (
+          <Doa entry={submitted} onDone={(msg) => { setSubmitted(null); setStatus(msg ? { type: 'success', msg } : null); }} />
+        ) : (
         <form
           noValidate
           onSubmit={onSubmit}
@@ -153,6 +200,7 @@ export default function Home() {
             {loading ? 'Mengirim…' : 'Kirim Kehadiran'}
           </button>
         </form>
+        )}
 
         <p className="animate-enter mt-6 text-center text-sm text-stone-500" style={{ animationDelay: '240ms' }}>
           Pengurus? <Link to="/login" className="font-medium text-brown-700 hover:underline">Masuk di sini</Link>

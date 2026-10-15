@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { api, formatWIB, todayWIB } from '../api';
 import { Alert, Shell, inputCls } from '../components/ui';
 
@@ -9,6 +9,12 @@ const Wa = ({ n }) =>
 // "MM-DD" → "15 Oktober"; opsional, jadi bisa kosong
 const ultah = (v) =>
   v ? new Date(2000, v.slice(0, 2) - 1, v.slice(3)).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' }) : '–';
+
+const DoaText = ({ text, className = '' }) => (
+  <p className={`whitespace-pre-line break-words rounded-lg bg-gold-100/50 px-3 py-2 text-sm text-stone-700 ${className}`}>
+    <span className="font-medium text-brown-800">Dukungan doa: </span>{text}
+  </p>
+);
 
 export default function Dashboard() {
   const [q, setQ] = useState('');
@@ -89,6 +95,7 @@ export default function Dashboard() {
               <dt className="text-stone-500">Kakak Komsel</dt><dd className="break-words">{r.kakakKomsel}</dd>
               <dt className="text-stone-500">Waktu</dt><dd>{formatWIB(r.tanggal)}</dd>
             </dl>
+            {r.dukunganDoa && <DoaText text={r.dukunganDoa} className="mt-3" />}
           </li>
         ))}
         {!loading && !rows.length && <li className="rounded-xl bg-white px-4 py-10 text-center text-stone-500 ring-1 ring-stone-200">Belum ada data kehadiran.</li>}
@@ -103,7 +110,8 @@ export default function Dashboard() {
           </thead>
           <tbody className="divide-y divide-stone-100">
             {rows.map((r, i) => (
-              <tr key={r._id} className="hover:bg-stone-50">
+              <Fragment key={r._id}>
+              <tr className={`hover:bg-stone-50 ${r.dukunganDoa ? 'border-b-0' : ''}`}>
                 <td className="px-4 py-3 text-stone-400">{i + 1}</td>
                 <td className="px-4 py-3 font-medium text-stone-900">{r.nama}</td>
                 <td className="px-4 py-3 tabular-nums">{r.npm}</td>
@@ -116,6 +124,13 @@ export default function Dashboard() {
                   <button onClick={() => remove(r)} className="text-red-600 hover:underline">Hapus</button>
                 </td>
               </tr>
+              {r.dukunganDoa && (
+                <tr>
+                  <td />
+                  <td colSpan={8} className="px-4 pb-3"><DoaText text={r.dukunganDoa} /></td>
+                </tr>
+              )}
+              </Fragment>
             ))}
             {!loading && !rows.length && (
               <tr><td colSpan={9} className="px-4 py-10 text-center text-stone-500">Belum ada data kehadiran.</td></tr>

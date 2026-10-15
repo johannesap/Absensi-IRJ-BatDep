@@ -16,6 +16,21 @@ export const create = async (req, res) => {
   res.status(201).json(doc);
 };
 
+// Publik: peserta menambahkan dukungan doa ke absensinya sendiri, sekali, di hari yang sama.
+// _id (dari respons absensi) dan NPM harus cocok supaya orang lain tidak bisa mengisi doa atas nama peserta lain.
+export const addDoa = async (req, res) => {
+  const { npm, doa } = req.body ?? {};
+  const text = String(doa ?? '').trim();
+  if (!text) return res.status(400).json({ message: 'Dukungan doa wajib diisi' });
+  const doc = await Attendance.findOneAndUpdate(
+    { _id: req.params.id, npm: String(npm ?? ''), dukunganDoa: { $exists: false }, tanggal: { $gte: startOfDayWIB(todayWIB()) } },
+    { dukunganDoa: text },
+    { runValidators: true },
+  );
+  if (!doc) return res.status(404).json({ message: 'Data kehadiran tidak ditemukan atau dukungan doa sudah dikirim' });
+  res.json({ message: 'Dukungan doa diterima' });
+};
+
 // Filter rentang satu hari WIB dari ?date=YYYY-MM-DD; false = format salah
 const dateFilter = (date) => {
   if (!date) return {};
