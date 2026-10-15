@@ -40,7 +40,7 @@ function Welcome() {
         className="word mt-12 rounded-full px-6 py-3 font-medium text-gold-100 ring-1 ring-gold-400 transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-gold-400"
         style={{ '--i': 7 }}
       >
-        Ketuk untuk masuk <span aria-hidden="true">♪</span>
+        Ketuk untuk masuk
       </button>
     </div>
   );
