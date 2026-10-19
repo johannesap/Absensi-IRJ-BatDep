@@ -106,7 +106,7 @@ export function Shell({ title, children }) {
           </nav>
         </div>
       </header>
-      {/* 7xl: tabel kehadiran punya 10 kolom; pb-24 agar tombol musik melayang tidak menutupi bagian bawah */}
+      {/* 7xl: tabel kehadiran punya 13 kolom; pb-24 agar tombol musik melayang tidak menutupi bagian bawah */}
       <main className="mx-auto max-w-7xl px-4 pt-6 pb-24">{children}</main>
     </div>
   );

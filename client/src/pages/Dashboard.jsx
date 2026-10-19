@@ -8,6 +8,10 @@ const PER_PAGE = 5;
 const Wa = ({ n }) =>
   n ? <a href={`https://wa.me/${n}`} target="_blank" rel="noreferrer" className="tabular-nums text-brown-700 hover:underline">+{n}</a> : '–';
 
+// Opsional; disimpan tanpa "@"
+const Ig = ({ u }) =>
+  u ? <a href={`https://instagram.com/${u}`} target="_blank" rel="noreferrer" className="text-brown-700 hover:underline">@{u}</a> : '–';
+
 // "MM-DD" → "15 Oktober"; opsional, jadi bisa kosong
 const ultah = (v) =>
   v ? new Date(2000, v.slice(0, 2) - 1, v.slice(3)).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' }) : '–';
@@ -110,8 +114,11 @@ export default function Dashboard() {
             </div>
             <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-3 text-sm">
               <dt className="text-stone-500">WhatsApp</dt><dd><Wa n={r.whatsapp} /></dd>
+              <dt className="text-stone-500">Instagram</dt><dd className="break-all"><Ig u={r.instagram} /></dd>
               <dt className="text-stone-500">Ulang Tahun</dt><dd>{ultah(r.ulangTahun)}</dd>
               <dt className="text-stone-500">Kakak Komsel</dt><dd className="break-words">{r.kakakKomsel}</dd>
+              <dt className="text-stone-500">Asal Gereja</dt><dd className="break-words">{r.asalGereja || '–'}</dd>
+              <dt className="text-stone-500">Tahu Dari</dt><dd className="break-words">{r.sumberInfo || '–'}</dd>
               <dt className="text-stone-500">Tanggal</dt><dd><TanggalJam d={r.tanggal} /></dd>
             </dl>
             {r.dukunganDoa && <DoaText text={r.dukunganDoa} className="mt-3" />}
@@ -124,7 +131,7 @@ export default function Dashboard() {
         <table className="w-full text-left text-sm">
           <thead className="bg-stone-50 text-xs uppercase tracking-wide text-stone-500">
             <tr>
-              {['No', 'Nama', 'NPM', 'Kelas', 'WhatsApp', 'Ulang Tahun', 'Kakak Komsel', 'Tanggal', 'Dukungan Doa', ''].map((h, i) => <th key={i} className="px-4 py-3 font-medium">{h}</th>)}
+              {['No', 'Nama', 'NPM', 'Kelas', 'WhatsApp', 'Instagram', 'Ulang Tahun', 'Kakak Komsel', 'Asal Gereja', 'Tahu Dari', 'Tanggal', 'Dukungan Doa', ''].map((h, i) => <th key={i} className="px-4 py-3 font-medium">{h}</th>)}
             </tr>
           </thead>
           <tbody className="divide-y divide-stone-100">
@@ -135,8 +142,11 @@ export default function Dashboard() {
                 <td className="px-4 py-3 tabular-nums">{r.npm}</td>
                 <td className="px-4 py-3">{r.kelas}</td>
                 <td className="px-4 py-3 whitespace-nowrap"><Wa n={r.whatsapp} /></td>
+                <td className="px-4 py-3 whitespace-nowrap"><Ig u={r.instagram} /></td>
                 <td className="px-4 py-3 whitespace-nowrap">{ultah(r.ulangTahun)}</td>
                 <td className="px-4 py-3">{r.kakakKomsel}</td>
+                <td className="px-4 py-3">{r.asalGereja || '–'}</td>
+                <td className="px-4 py-3">{r.sumberInfo || '–'}</td>
                 <td className="px-4 py-3 whitespace-nowrap text-stone-500"><TanggalJam d={r.tanggal} /></td>
                 <td className="min-w-44 max-w-xs px-4 py-3 whitespace-pre-line break-words">{r.dukunganDoa || '–'}</td>
                 <td className="px-4 py-3 text-right">
@@ -145,7 +155,7 @@ export default function Dashboard() {
               </tr>
             ))}
             {!loading && !rows.length && (
-              <tr><td colSpan={10} className="px-4 py-10 text-center text-stone-500">Belum ada data kehadiran.</td></tr>
+              <tr><td colSpan={13} className="px-4 py-10 text-center text-stone-500">Belum ada data kehadiran.</td></tr>
             )}
           </tbody>
         </table>

@@ -12,6 +12,14 @@ const attendanceSchema = new mongoose.Schema({
     set: (v) => String(v).replace(/^0/, '62'),
     match: [/^628\d{7,11}$/, 'Nomor WhatsApp tidak valid (cth. 081234567890)'],
   },
+  // Opsional; disimpan tanpa "@" dan huruf kecil, sesuai aturan username Instagram (huruf, angka, titik, garis bawah)
+  instagram: {
+    type: String,
+    set: (v) => v && String(v).trim().replace(/^@/, '').toLowerCase(),
+    match: [/^[a-z0-9._]{1,30}$/, 'ID Instagram tidak valid'],
+  },
+  asalGereja: { type: String, required: [true, 'Asal Gereja wajib diisi'], trim: true, maxlength: [100, 'Asal Gereja maksimal 100 karakter'] },
+  sumberInfo: { type: String, required: [true, 'Asal info Ibadah Raya Jumat wajib diisi'], trim: true, maxlength: [100, 'Asal info maksimal 100 karakter'] },
   // Opsional, "MM-DD" tanpa tahun: cukup untuk ucapan ulang tahun dan kurang sensitif jika bocor
   ulangTahun: {
     type: String,

@@ -7,7 +7,7 @@ export const startOfDayWIB = (ymd) => new Date(`${ymd}T00:00:00+07:00`);
 export const todayWIB = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
 
 export const create = async (req, res) => {
-  const { nama, npm, kelas, kakakKomsel, whatsapp, ulangTahun } = req.body ?? {};
+  const { nama, npm, kelas, kakakKomsel, whatsapp, instagram, asalGereja, sumberInfo, ulangTahun } = req.body ?? {};
   // Batas 13 digit berlaku untuk nomor seperti yang diketik, sebelum dinormalisasi ke 62… oleh model
   if (whatsapp && !/^\d{1,13}$/.test(String(whatsapp))) {
     return res.status(400).json({ message: 'Nomor WhatsApp hanya boleh angka, maksimal 13 digit' });
@@ -16,7 +16,10 @@ export const create = async (req, res) => {
   if (await Attendance.exists({ npm: String(npm ?? '').trim(), tanggal: { $gte: startOfDayWIB(todayWIB()) } })) {
     return res.status(409).json({ message: 'NPM ini sudah tercatat hadir hari ini' });
   }
-  const doc = await Attendance.create({ nama, npm, kelas, kakakKomsel, whatsapp, ulangTahun: ulangTahun || undefined });
+  const doc = await Attendance.create({
+    nama, npm, kelas, kakakKomsel, whatsapp, asalGereja, sumberInfo,
+    instagram: instagram || undefined, ulangTahun: ulangTahun || undefined,
+  });
   res.status(201).json(doc);
 };
 

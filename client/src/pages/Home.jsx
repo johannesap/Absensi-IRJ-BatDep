@@ -9,11 +9,20 @@ const FIELDS = [
   { name: 'kelas', label: 'Kelas', placeholder: 'cth. 3IA01', maxLength: 5 },
   { name: 'kakakKomsel', label: 'Kakak Komsel', placeholder: 'Nama kakak komsel', maxLength: 100 },
   { name: 'whatsapp', label: 'Nomor WhatsApp', placeholder: 'cth. 081234567890', type: 'tel', inputMode: 'numeric', autoComplete: 'tel' },
+  {
+    name: 'instagram', optional: true, label: <>ID Instagram <span className="font-normal text-stone-400">(opsional)</span></>,
+    placeholder: 'cth. @yohanes.saputra', maxLength: 31, autoCapitalize: 'none', autoCorrect: 'off', spellCheck: false,
+  },
+  { name: 'asalGereja', label: 'Asal Gereja', placeholder: 'cth. GBI Depok', maxLength: 100 },
+  {
+    name: 'sumberInfo', label: 'Kamu tahu Ibadah Raya Jumat dari mana?', wajib: 'Tuliskan dari mana kamu tahu Ibadah Raya Jumat',
+    placeholder: 'cth. teman, Instagram, kakak komsel', maxLength: 100,
+  },
 ];
 // Kolom angka saja: selain angka dibuang saat diketik/ditempel, lalu dipotong ke panjang maksimal.
 // (Bukan maxLength: maxLength memotong teks tempelan seperti "0812 3456 7890" sebelum spasinya dibuang.)
 const DIGITS = { npm: 8, whatsapp: 13 };
-const EMPTY = { nama: '', npm: '', kelas: '', kakakKomsel: '', whatsapp: '', lahirHari: '', lahirBulan: '' };
+const EMPTY = { nama: '', npm: '', kelas: '', kakakKomsel: '', whatsapp: '', instagram: '', asalGereja: '', sumberInfo: '', lahirHari: '', lahirBulan: '' };
 const HARI = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
 const BULAN = Array.from({ length: 12 }, (_, i) => new Date(2000, i, 1).toLocaleDateString('id-ID', { month: 'long' }));
 
@@ -51,11 +60,15 @@ function Welcome() {
 
 export function validate(form) {
   const errors = {};
-  for (const { name, label } of FIELDS) if (!form[name].trim()) errors[name] = `${label} wajib diisi`;
+  for (const { name, label, optional, wajib } of FIELDS) if (!optional && !form[name].trim()) errors[name] = wajib ?? `${label} wajib diisi`;
   if (form.npm.trim() && !/^\d{8}$/.test(form.npm.trim())) errors.npm = 'NPM harus 8 digit angka';
   // Sama dengan normalisasi di server (models/Attendance.js); input sudah angka saja, maks. 13 digit
   if (form.whatsapp && !/^628\d{7,11}$/.test(form.whatsapp.replace(/^0/, '62'))) {
     errors.whatsapp = 'Nomor WhatsApp tidak valid (cth. 081234567890)';
+  }
+  // Sama dengan models/Attendance.js: "@" di depan boleh, sisanya huruf, angka, titik, garis bawah
+  if (form.instagram.trim() && !/^[a-z0-9._]{1,30}$/i.test(form.instagram.trim().replace(/^@/, ''))) {
+    errors.instagram = 'ID Instagram hanya boleh huruf, angka, titik, dan garis bawah';
   }
   const { lahirHari: d, lahirBulan: m } = form;
   if (!d !== !m) errors.lahir = 'Pilih tanggal dan bulan, atau kosongkan keduanya';
@@ -206,7 +219,7 @@ export default function Home() {
           className="animate-enter mt-8 space-y-4 rounded-2xl border-t-4 border-gold-400 bg-white p-5 shadow-sm ring-1 ring-stone-200 sm:p-6"
           style={{ animationDelay: '120ms' }}
         >
-          {FIELDS.map((f) => (
+          {FIELDS.map(({ optional, wajib, ...f }) => (
             <Field key={f.name} id={f.name} {...f} value={form[f.name]} error={errors[f.name]} onChange={onChange} />
           ))}
           <fieldset>
