@@ -32,7 +32,7 @@ const attendanceSchema = new mongoose.Schema({
       message: 'Tanggal ulang tahun tidak valid',
     },
   },
-  // Opsional, diisi peserta setelah absen (lihat addDoa)
+  // Opsional, diisi peserta setelah presensi (lihat addDoa)
   dukunganDoa: { type: String, trim: true, maxlength: [1000, 'Dukungan doa maksimal 1000 karakter'] },
   tanggal: { type: Date, default: Date.now },
 });

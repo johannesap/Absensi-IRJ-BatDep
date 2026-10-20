@@ -49,7 +49,7 @@ export default function Login() {
         </div>
         <Alert>{error}</Alert>
         <button disabled={loading} className={`rise ${btnPrimary} w-full`} style={{ '--i': 4 }}>{loading ? 'Memproses…' : 'Masuk'}</button>
-        <Link to="/" className="rise block text-center text-sm text-stone-500 hover:text-stone-700" style={{ '--i': 5 }}>← Kembali ke form absensi</Link>
+        <Link to="/" className="rise block text-center text-sm text-stone-500 hover:text-stone-700" style={{ '--i': 5 }}>← Kembali ke form presensi</Link>
       </form>
     </main>
   );

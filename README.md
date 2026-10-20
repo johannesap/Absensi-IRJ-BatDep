@@ -1,8 +1,8 @@
-# Absensi Ibadah Raya Jumat — PD Universitas Gunadarma
+# Presensi Ibadah Raya Jumat — PD Universitas Gunadarma
 
 ```
 client/                 React + Vite + Tailwind v4
-  public/praise.mp3     Lagu latar (diputar pada klik pertama di halaman absensi, lanjut ke halaman login/pengurus)
+  public/praise.mp3     Lagu latar (diputar pada klik pertama di halaman presensi, lanjut ke halaman login/pengurus)
   src/
     main.jsx            Router + guard role (Protected)
     api.js              fetch wrapper, sesi JWT, helper tanggal WIB
@@ -10,7 +10,7 @@ client/                 React + Vite + Tailwind v4
     components/ui.jsx   Field, Alert, Shell (header halaman petugas)
     components/Backsound.jsx  Pemutar lagu latar + tombol Jeda/Putar, di luar <Routes> agar tidak berhenti saat pindah halaman
     pages/
-      Home.jsx          Form absensi publik (tanggal otomatis, read-only)
+      Home.jsx          Form presensi publik (tanggal otomatis, read-only)
       Login.jsx         Login petugas → diarahkan sesuai role
       Dashboard.jsx     Tabel kehadiran, cari nama/NPM, filter tanggal
       Admin.jsx         CRUD akun User Penggembalaan
@@ -58,7 +58,7 @@ npm run dev               # http://localhost:5173, /api diproxy ke :5000
 
 Production: `cd client && npm run build`, lalu `cd server && npm start`. Express melayani hasil build sekaligus API di satu port.
 
-Satu NPM hanya bisa absen sekali per hari (zona waktu WIB).
+Satu NPM hanya bisa presensi sekali per hari (zona waktu WIB).
 
 ## Deploy ke Netlify (tanpa kartu kredit)
 
@@ -67,7 +67,7 @@ Frontend dan API berjalan di satu situs Netlify: API dijalankan sebagai Netlify 
 1. MongoDB Atlas: Network Access harus berisi `0.0.0.0/0` (IP Netlify berubah-ubah).
 2. Netlify: **Add new site → Import an existing project → GitHub**, pilih repo ini. Pengaturan build dibaca otomatis dari [netlify.toml](./netlify.toml).
 3. Di **Site configuration → Environment variables**, isi `MONGO_URI`, `JWT_SECRET` (string acak panjang), `ADMIN_USERNAME`, `ADMIN_PASSWORD`, lalu **Deploys → Trigger deploy**.
-4. Uji form absensi dan login petugas lewat URL Netlify.
+4. Uji form presensi dan login petugas lewat URL Netlify.
 
 Alternatif: [render.yaml](./render.yaml) masih bisa dipakai untuk menjalankan API di Render (`node index.js`), tapi Render kini meminta kartu kredit. Jika memakai Render, set `CORS_ORIGINS` ke URL frontend dan `VITE_API_URL` ke URL Render.
 

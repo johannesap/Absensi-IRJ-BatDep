@@ -23,8 +23,8 @@ export const create = async (req, res) => {
   res.status(201).json(doc);
 };
 
-// Publik: peserta menambahkan dukungan doa ke absensinya sendiri, sekali, di hari yang sama.
-// _id (dari respons absensi) dan NPM harus cocok supaya orang lain tidak bisa mengisi doa atas nama peserta lain.
+// Publik: peserta menambahkan dukungan doa ke presensinya sendiri, sekali, di hari yang sama.
+// _id (dari respons presensi) dan NPM harus cocok supaya orang lain tidak bisa mengisi doa atas nama peserta lain.
 export const addDoa = async (req, res) => {
   const { npm, doa } = req.body ?? {};
   const text = String(doa ?? '').trim();

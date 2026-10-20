@@ -3,7 +3,7 @@ import { useLocation } from 'react-router';
 
 // Lagu latar "Praise" – Elevation Worship (client/public/praise.mp3). Dipasang di luar <Routes> supaya tetap
 // berputar saat pindah halaman (mis. ke login pengurus). Browser memblokir suara sebelum pengunjung berinteraksi,
-// jadi lagu diputar pada klik/tombol pertama di halaman absensi. Listener "click" (bukan pointerdown) supaya klik
+// jadi lagu diputar pada klik/tombol pertama di halaman presensi. Listener "click" (bukan pointerdown) supaya klik
 // pertama pada tombol Jeda/Putar tidak langsung memutar lalu menjeda lagi.
 export default function Backsound() {
   const audio = useRef(null);

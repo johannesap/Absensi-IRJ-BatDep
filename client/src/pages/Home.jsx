@@ -76,7 +76,7 @@ export function validate(form) {
   return errors;
 }
 
-// Muncul setelah kehadiran tercatat; doa disimpan ke absensi itu (server mencocokkan _id + NPM)
+// Muncul setelah kehadiran tercatat; doa disimpan ke presensi itu (server mencocokkan _id + NPM)
 function Doa({ entry, onDone }) {
   const [doa, setDoa] = useState('');
   const [sending, setSending] = useState(false);
@@ -146,7 +146,7 @@ function Thanks({ nama, sent, onDone }) {
 
 export default function Home() {
   const [form, setForm] = useState(EMPTY);
-  const [submitted, setSubmitted] = useState(null); // absensi yang baru tercatat → tampilkan kolom dukungan doa
+  const [submitted, setSubmitted] = useState(null); // presensi yang baru tercatat → tampilkan kolom dukungan doa
   const [thanks, setThanks] = useState(null); // { nama, sent } → layar terima kasih
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState(null);
