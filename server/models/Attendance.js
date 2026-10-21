@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
 
+// Tanggal hari ini di WIB, "YYYY-MM-DD"
+export const todayWIB = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
+
 const attendanceSchema = new mongoose.Schema({
   nama: { type: String, required: [true, 'Nama wajib diisi'], trim: true, maxlength: [100, 'Nama maksimal 100 karakter'] },
   npm: { type: String, required: [true, 'NPM wajib diisi'], trim: true, match: [/^\d{8}$/, 'NPM harus 8 digit angka'] },
@@ -35,9 +38,12 @@ const attendanceSchema = new mongoose.Schema({
   // Opsional, diisi peserta setelah presensi (lihat addDoa)
   dukunganDoa: { type: String, trim: true, maxlength: [1000, 'Dukungan doa maksimal 1000 karakter'] },
   tanggal: { type: Date, default: Date.now },
+  // Hari presensi (WIB); index unik (npm, hari) menjamin satu NPM sekali per hari, walau dua kiriman datang bersamaan
+  hari: { type: String, default: todayWIB },
 });
 
 attendanceSchema.index({ tanggal: -1 });
-attendanceSchema.index({ npm: 1, tanggal: -1 });
+// partial: data lama (sebelum ada kolom hari) tidak ikut dicek
+attendanceSchema.index({ npm: 1, hari: 1 }, { unique: true, partialFilterExpression: { hari: { $exists: true } } });
 
 export default mongoose.model('Attendance', attendanceSchema);

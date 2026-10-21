@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { api } from '../api';
+import { api, session } from '../api';
 import { Alert, Field, Shell, btnPrimary } from '../components/ui';
 
 const EMPTY = { oldPassword: '', newPassword: '', confirm: '' };
@@ -17,7 +17,8 @@ export default function Password() {
     setMsg(null);
     setSaving(true);
     try {
-      await api('/auth/password', { method: 'PUT', body: { oldPassword: form.oldPassword, newPassword: form.newPassword } });
+      const { token } = await api('/auth/password', { method: 'PUT', body: { oldPassword: form.oldPassword, newPassword: form.newPassword } });
+      session.set({ ...session.get(), token }); // token lama tidak berlaku lagi setelah password diganti
       setForm(EMPTY);
       setMsg({ type: 'success', text: 'Password berhasil diganti.' });
     } catch (err) {

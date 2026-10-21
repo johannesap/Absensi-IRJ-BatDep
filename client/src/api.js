@@ -12,8 +12,7 @@ try { localStorage.removeItem('session'); } catch { /* storage diblokir */ }
 
 export async function api(path, { method = 'GET', body } = {}) {
   const s = session.get();
-  const apiUrl = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
-  const res = await fetch(apiUrl + '/api' + path, {
+  const res = await fetch('/api' + path, {
     method,
     headers: { 'Content-Type': 'application/json', ...(s && { Authorization: `Bearer ${s.token}` }) },
     body: body && JSON.stringify(body),

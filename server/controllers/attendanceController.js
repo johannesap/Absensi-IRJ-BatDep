@@ -1,10 +1,9 @@
-import Attendance from '../models/Attendance.js';
+import Attendance, { todayWIB } from '../models/Attendance.js';
 
 const DAY = 24 * 60 * 60 * 1000;
 
 // Awal hari (00:00 WIB) untuk tanggal "YYYY-MM-DD"
 export const startOfDayWIB = (ymd) => new Date(`${ymd}T00:00:00+07:00`);
-export const todayWIB = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
 
 export const create = async (req, res) => {
   const { nama, npm, kelas, kakakKomsel, whatsapp, instagram, asalGereja, sumberInfo, ulangTahun } = req.body ?? {};
@@ -12,10 +11,7 @@ export const create = async (req, res) => {
   if (whatsapp && !/^\d{1,13}$/.test(String(whatsapp))) {
     return res.status(400).json({ message: 'Nomor WhatsApp hanya boleh angka, maksimal 13 digit' });
   }
-  // Tanggal selalu diisi server, bukan dari client
-  if (await Attendance.exists({ npm: String(npm ?? '').trim(), tanggal: { $gte: startOfDayWIB(todayWIB()) } })) {
-    return res.status(409).json({ message: 'NPM ini sudah tercatat hadir hari ini' });
-  }
+  // Tanggal selalu diisi server, bukan dari client. NPM yang sudah hadir hari ini ditolak index unik (npm, hari) → 409 di app.js
   const doc = await Attendance.create({
     nama, npm, kelas, kakakKomsel, whatsapp, asalGereja, sumberInfo,
     instagram: instagram || undefined, ulangTahun: ulangTahun || undefined,
@@ -45,25 +41,19 @@ const dateFilter = (date) => {
   const start = startOfDayWIB(date);
   return { tanggal: { $gte: start, $lt: new Date(start.getTime() + DAY) } };
 };
-const badDate = (res) => res.status(400).json({ message: 'Format tanggal tidak valid' });
 
 export const list = async (req, res) => {
   const { q, date } = req.query;
   const filter = dateFilter(date);
-  if (!filter) return badDate(res);
-  if (q) {
-    const rx = new RegExp(String(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-    filter.$or = [{ nama: rx }, { npm: rx }];
-  }
-  // ponytail: dibatasi 1000 baris tanpa paginasi; tambahkan paginasi jika data per filter melebihi itu
-  res.json(await Attendance.find(filter).sort({ tanggal: -1 }).limit(1000));
-};
-
-// Total hadir per tanggal, tidak terpengaruh pencarian maupun batas 1000 baris
-export const count = async (req, res) => {
-  const filter = dateFilter(req.query.date);
-  if (!filter) return badDate(res);
-  res.json({ count: await Attendance.countDocuments(filter) });
+  if (!filter) return res.status(400).json({ message: 'Format tanggal tidak valid' });
+  const rx = q && new RegExp(String(q).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+  const [rows, count] = await Promise.all([
+    // ponytail: dibatasi 1000 baris tanpa paginasi (dashboard memberi tahu saat batas tercapai); tambahkan paginasi jika data lama perlu dijelajahi
+    Attendance.find(rx ? { ...filter, $or: [{ nama: rx }, { npm: rx }] } : filter).sort({ tanggal: -1 }).limit(1000),
+    // Total hadir per tanggal, tidak terpengaruh pencarian maupun batas 1000 baris
+    Attendance.countDocuments(filter),
+  ]);
+  res.json({ rows, count });
 };
 
 export const remove = async (req, res) => {

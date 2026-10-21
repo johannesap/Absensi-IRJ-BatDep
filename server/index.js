@@ -1,4 +1,4 @@
-// Server lokal / Render. Di Netlify, app yang sama dijalankan lewat functions/api.js
+// Server lokal. Di Vercel, app yang sama dijalankan lewat api/index.mjs
 import app, { connectDB } from './app.js';
 
 await connectDB();

@@ -14,11 +14,11 @@ client/                 React + Vite + Tailwind v4
       Login.jsx         Login petugas → diarahkan sesuai role
       Dashboard.jsx     Tabel kehadiran, cari nama/NPM, filter tanggal
       Admin.jsx         CRUD akun User Penggembalaan
-      Password.jsx      Ganti password sendiri (User Penggembalaan)
+      Password.jsx      Ganti password sendiri (Admin dan User Penggembalaan)
 server/                 Express 5 + Mongoose
   app.js                App Express, error handler, koneksi DB + seed admin pertama
-  index.js              Jalankan server lokal / Render
-  functions/api.js      Pembungkus app untuk Netlify Function
+  index.js              Jalankan server lokal
+  test/                 Tes model presensi dan batas hari WIB (`npm test`, tanpa database)
   routes.js             Semua endpoint API
   middleware/auth.js    Verifikasi JWT + cek role
   models/               User (role admin|penggembalaan), Attendance
@@ -30,11 +30,10 @@ server/                 Express 5 + Mongoose
 | Method | Endpoint              | Akses              |
 |--------|-----------------------|--------------------|
 | POST   | /api/auth/login       | publik             |
-| PUT    | /api/auth/password    | penggembalaan (wajib password lama) |
+| PUT    | /api/auth/password    | penggembalaan, admin (wajib password lama; token lama tidak berlaku lagi) |
 | POST   | /api/attendance       | publik             |
 | POST   | /api/attendance/:id/doa | publik (NPM harus cocok, sekali, hari yang sama) |
-| GET    | /api/attendance?q=&date=YYYY-MM-DD | penggembalaan, admin |
-| GET    | /api/attendance/count?date=YYYY-MM-DD | penggembalaan, admin |
+| GET    | /api/attendance?q=&date=YYYY-MM-DD → `{ rows, count }` | penggembalaan, admin |
 | DELETE | /api/attendance/:id   | penggembalaan, admin   |
 | GET/POST | /api/users          | admin              |
 | PUT/DELETE | /api/users/:id    | admin              |
@@ -58,27 +57,17 @@ npm run dev               # http://localhost:5173, /api diproxy ke :5000
 
 Production: `cd client && npm run build`, lalu `cd server && npm start`. Express melayani hasil build sekaligus API di satu port.
 
-Satu NPM hanya bisa presensi sekali per hari (zona waktu WIB).
-
-## Deploy ke Netlify (tanpa kartu kredit)
-
-Frontend dan API berjalan di satu situs Netlify: API dijalankan sebagai Netlify Function ([server/functions/api.js](./server/functions/api.js)), database di MongoDB Atlas. Tidak perlu CORS maupun `VITE_API_URL`.
-
-1. MongoDB Atlas: Network Access harus berisi `0.0.0.0/0` (IP Netlify berubah-ubah).
-2. Netlify: **Add new site → Import an existing project → GitHub**, pilih repo ini. Pengaturan build dibaca otomatis dari [netlify.toml](./netlify.toml).
-3. Di **Site configuration → Environment variables**, isi `MONGO_URI`, `JWT_SECRET` (string acak panjang), `ADMIN_USERNAME`, `ADMIN_PASSWORD`, lalu **Deploys → Trigger deploy**.
-4. Uji form presensi dan login petugas lewat URL Netlify.
-
-Alternatif: [render.yaml](./render.yaml) masih bisa dipakai untuk menjalankan API di Render (`node index.js`), tapi Render kini meminta kartu kredit. Jika memakai Render, set `CORS_ORIGINS` ke URL frontend dan `VITE_API_URL` ke URL Render.
+Satu NPM hanya bisa presensi sekali per hari (zona waktu WIB), dijaga index unik `(npm, hari)` di MongoDB.
 
 Jangan simpan nilai rahasia MongoDB atau kredensial admin ke repository. Akun admin pertama dibuat otomatis saat API terhubung ke database yang belum memiliki admin.
 
 ## Deploy frontend dan API ke Vercel
 
-Vercel juga dapat menjalankan frontend dan API dalam satu project. Function [api/index.mjs](./api/index.mjs) menggunakan Express yang sama (semua `/api/*` di-rewrite ke sana; `.mjs` agar tidak diubah Vercel ke CommonJS); browser memanggil `/api` pada domain Vercel, jadi `VITE_API_URL` tidak perlu diatur.
+Vercel juga dapat menjalankan frontend dan API dalam satu project. Function [api/index.mjs](./api/index.mjs) menggunakan Express yang sama (semua `/api/*` di-rewrite ke sana; `.mjs` agar tidak diubah Vercel ke CommonJS); browser memanggil `/api` pada domain yang sama.
 
 1. Import repository ke Vercel dengan project root di direktori repository. Build dan instalasi sudah dikonfigurasi di [vercel.json](./vercel.json).
 2. Tambahkan environment variables untuk Production: `MONGO_URI`, `JWT_SECRET`, `ADMIN_USERNAME`, dan `ADMIN_PASSWORD`. Gunakan rahasia kuat dan jangan simpan nilainya di repository.
 3. Pastikan IP access list MongoDB Atlas mengizinkan koneksi dari Vercel. Setelah deploy, uji `https://<domain-vercel>/api/health`; status `200` menandakan API berhasil terhubung ke MongoDB.
-4. Akun admin dibuat otomatis saat API pertama kali terhubung ke database yang belum memiliki admin. Login menggunakan nilai `ADMIN_USERNAME` dan `ADMIN_PASSWORD` yang ditetapkan di Vercel.
+4. Akun admin dibuat otomatis saat API pertama kali terhubung ke database yang belum memiliki admin. Login menggunakan nilai `ADMIN_USERNAME` dan `ADMIN_PASSWORD` yang ditetapkan di Vercel, lalu segera ganti password lewat menu **Ganti Password**. Mengubah `ADMIN_PASSWORD` di Vercel setelah itu tidak berpengaruh.
 5. Vercel Cron di [vercel.json](./vercel.json) memanggil `/api/health` setiap Senin 08.00 WIB. Panggilan ini membuka koneksi ke MongoDB, sehingga cluster Atlas gratis tidak di-pause otomatis karena 30 hari tanpa koneksi (misalnya saat libur semester).
+6. **Wajib:** batasi request supaya login tidak bisa ditebak beruntun dan form tidak bisa dibanjiri data palsu. Di dashboard Vercel: project → **Firewall** → **Add Rule** → kondisi *Request Path* *starts with* `/api/` dan *Method* *equals* `POST` → aksi **Rate Limit**, 10 request per 60 detik per IP, aksi bawaan. Paket Hobby mendapat 1 aturan rate limit per project.

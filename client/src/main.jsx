@@ -23,7 +23,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/login" element={<Login />} />
         <Route path="/penggembalaan" element={<Protected roles={['penggembalaan', 'admin']}><Dashboard /></Protected>} />
         <Route path="/admin" element={<Protected roles={['admin']}><Admin /></Protected>} />
-        <Route path="/password" element={<Protected roles={['penggembalaan']}><Password /></Protected>} />
+        <Route path="/password" element={<Protected roles={['penggembalaan', 'admin']}><Password /></Protected>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Backsound />

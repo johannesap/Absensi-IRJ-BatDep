@@ -45,31 +45,30 @@ export default function Dashboard() {
   const pages = Math.max(1, Math.ceil(rows.length / PER_PAGE));
   const p = Math.min(page, pages - 1);
   const shown = rows.slice(p * PER_PAGE, (p + 1) * PER_PAGE);
-
-  // silent: refresh otomatis di latar, tanpa menampilkan "Memuat…"
-  const load = (silent) => {
-    if (!silent) setLoading(true);
-    return Promise.all([
-      api(`/attendance?${new URLSearchParams({ q, date })}`),
-      api(`/attendance/count?${new URLSearchParams({ date })}`),
-    ])
-      .then(([data, { count }]) => { setRows(data); setTotal(count); setError(''); })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  };
+  // Hanya data hari ini yang bisa bertambah, jadi hanya hari ini yang diperbarui otomatis
+  const isToday = date === todayWIB();
 
   useEffect(() => {
+    let live = true; // jawaban untuk filter lama diabaikan walau datang belakangan (mis. sinyal lambat)
+    // silent: refresh otomatis di latar, tanpa menampilkan "Memuat…"
+    const load = (silent) => {
+      if (!silent) setLoading(true);
+      api(`/attendance?${new URLSearchParams({ q, date })}`)
+        .then((data) => { if (live) { setRows(data.rows); setTotal(data.count); setError(''); } })
+        .catch((err) => live && setError(err.message))
+        .finally(() => live && setLoading(false));
+    };
     setPage(0);
     const t = setTimeout(load, 300); // debounce ketikan pencarian
-    const timer = setInterval(() => !document.hidden && load(true), 15000);
-    return () => { clearTimeout(t); clearInterval(timer); };
+    const timer = isToday && setInterval(() => !document.hidden && load(true), 15000);
+    return () => { live = false; clearTimeout(t); clearInterval(timer); };
   }, [q, date]);
 
   async function remove(row) {
     if (!confirm(`Hapus data kehadiran ${row.nama} (${row.npm})?`)) return;
     try {
       await api(`/attendance/${row._id}`, { method: 'DELETE' });
-      setRows(rows.filter((r) => r._id !== row._id));
+      setRows((rs) => rs.filter((r) => r._id !== row._id));
       setTotal((n) => n - 1);
     } catch (err) {
       setError(err.message);
@@ -87,7 +86,7 @@ export default function Dashboard() {
         <p className="mt-1 text-brown-800">
           <span className="text-4xl font-semibold tabular-nums">{total ?? '–'}</span> mahasiswa
         </p>
-        <p className="mt-1 text-xs text-stone-400">Diperbarui otomatis setiap 15 detik</p>
+        {isToday && <p className="mt-1 text-xs text-stone-400">Diperbarui otomatis setiap 15 detik</p>}
       </section>
 
       <div className="flex flex-col gap-3 sm:flex-row">
@@ -99,6 +98,8 @@ export default function Dashboard() {
       <div className="mt-4 flex items-center justify-between text-sm text-stone-500">
         <span>{loading ? 'Memuat…' : q && `${rows.length} hasil pencarian`}</span>
       </div>
+      {/* 1000 = batas list di server (attendanceController) */}
+      {rows.length === 1000 && <p className="mt-2 text-sm text-stone-500">Hanya 1000 data terbaru yang ditampilkan. Pilih tanggal untuk melihat data lama.</p>}
       <div className="mt-2"><Alert>{error}</Alert></div>
 
       {/* HP: kartu per mahasiswa, tanpa geser ke samping */}

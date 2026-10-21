@@ -12,8 +12,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const s = session.get();
-  // Sesi lama ber-role "pendataan" diabaikan, kalau tidak akan redirect bolak-balik dengan /penggembalaan
-  if (s && ['admin', 'penggembalaan'].includes(s.role)) return <Navigate to={home(s.role)} replace />;
+  if (s) return <Navigate to={home(s.role)} replace />;
 
   async function onSubmit(e) {
     e.preventDefault();

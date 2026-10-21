@@ -58,7 +58,7 @@ function Welcome() {
   );
 }
 
-export function validate(form) {
+function validate(form) {
   const errors = {};
   for (const { name, label, optional, wajib } of FIELDS) if (!optional && !form[name].trim()) errors[name] = wajib ?? `${label} wajib diisi`;
   if (form.npm.trim() && !/^\d{8}$/.test(form.npm.trim())) errors.npm = 'NPM harus 8 digit angka';

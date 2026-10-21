@@ -88,19 +88,10 @@ export function Shell({ title, children }) {
               <h1 className="font-semibold">{title}</h1>
             </div>
           </div>
-          <nav className="flex items-center gap-2 text-sm">
-            {s.role === 'admin' && (
-              <>
-                <NavLink to="/penggembalaan" className={tab}>Kehadiran</NavLink>
-                <NavLink to="/admin" className={tab}>Akun</NavLink>
-              </>
-            )}
-            {s.role === 'penggembalaan' && (
-              <>
-                <NavLink to="/penggembalaan" className={tab}>Kehadiran</NavLink>
-                <NavLink to="/password" className={tab}>Ganti Password</NavLink>
-              </>
-            )}
+          <nav className="flex flex-wrap items-center gap-2 text-sm">
+            <NavLink to="/penggembalaan" className={tab}>Kehadiran</NavLink>
+            {s.role === 'admin' && <NavLink to="/admin" className={tab}>Akun</NavLink>}
+            <NavLink to="/password" className={tab}>Ganti Password</NavLink>
             <span className="hidden px-2 text-brown-100 sm:inline">{s.name}</span>
             <button className="rounded-lg px-3 py-1.5 text-sm ring-1 ring-white/30 transition-colors hover:bg-white/10" onClick={() => { session.clear(); navigate('/login'); }}>Keluar</button>
           </nav>

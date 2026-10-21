@@ -9,8 +9,11 @@ export const auth = (...roles) => async (req, res, next) => {
   } catch {
     return res.status(401).json({ message: 'Sesi berakhir, silakan login ulang' });
   }
-  // Akun yang sudah dihapus admin langsung kehilangan akses walau token belum kedaluwarsa
-  if (!(await User.exists({ _id: payload.id }))) return res.status(401).json({ message: 'Akun tidak ditemukan' });
+  // Akun yang dihapus, atau disimpan ulang setelah token dibuat (mis. ganti password), langsung kehilangan akses
+  // walau token belum kedaluwarsa. iat dalam detik, jadi +1: token yang dibuat tepat sesudah penyimpanan tetap sah
+  if (!(await User.exists({ _id: payload.id, updatedAt: { $lt: new Date((payload.iat + 1) * 1000) } }))) {
+    return res.status(401).json({ message: 'Sesi berakhir, silakan login ulang' });
+  }
   if (!roles.includes(payload.role)) return res.status(403).json({ message: 'Akses ditolak' });
   req.user = payload;
   next();
