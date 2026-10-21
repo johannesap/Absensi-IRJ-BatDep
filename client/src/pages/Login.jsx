@@ -35,8 +35,8 @@ export default function Login() {
       <div aria-hidden="true" className="login-glow pointer-events-none absolute inset-0 m-auto size-[36rem] max-w-[150vw]" />
       <form onSubmit={onSubmit} className="login-card relative mx-auto w-full max-w-sm space-y-4 overflow-hidden rounded-2xl bg-white p-6 pt-7 shadow-lg shadow-brown-800/5 ring-1 ring-stone-200">
         <span aria-hidden="true" className="login-sweep absolute inset-x-0 top-0 h-1 bg-gold-400" />
-        <div>
-          <Cross className="cross-draw mb-3 h-8 w-6 text-gold-400" />
+        <div className="text-center">
+          <Cross className="cross-draw mx-auto mb-3 h-8 w-6 text-gold-400" />
           <h1 className="rise text-xl font-semibold text-brown-800" style={{ '--i': 0 }}>Masuk Pengurus</h1>
           <p className="rise mt-1 text-sm text-stone-500" style={{ '--i': 1 }}>Untuk Admin dan User Penggembalaan.</p>
         </div>
