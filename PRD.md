@@ -62,7 +62,8 @@ Akun admin pertama dibuat otomatis dari environment variable saat aplikasi perta
 
 - Semua pesan kesalahan berbahasa Indonesia dan muncul di bawah kolom yang salah.
 - Server mengecek aturan yang sama dengan form. Data yang tidak lolos ditolak walau dikirim tanpa lewat form.
-- Di bawah form ada pemberitahuan bahwa data hanya dipakai untuk pelayanan PD dan hanya dilihat pengurus.
+- Di bawah form ada pemberitahuan bahwa data hanya dipakai untuk pelayanan PD, hanya dilihat pengurus, dan isiannya disimpan di perangkat peserta.
+- Setelah presensi berhasil, isian form (tanpa dukungan doa) disimpan di perangkat itu (localStorage). Presensi berikutnya dari perangkat yang sama langsung terisi, jadi peserta tinggal mengecek lalu mengirim. Tombol "Bukan kamu? Kosongkan" menghapus isian tersimpan, untuk HP yang dipakai bergantian.
 
 ### 5.2 Aturan presensi
 
@@ -119,7 +120,7 @@ Akun admin pertama dibuat otomatis dari environment variable saat aplikasi perta
 | **Bahasa** | Seluruh tampilan dan pesan dalam bahasa Indonesia. Waktu memakai WIB |
 | **Aksesibilitas** | Setiap kolom punya label, kesalahan dibacakan pembaca layar, dan tersedia tombol untuk melihat password |
 | **Keamanan** | Password di-hash dengan bcrypt. Hak akses dicek di server, bukan hanya di tampilan. Login dibatasi Firewall. Header keamanan dipasang (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`) |
-| **Privasi** | Data pribadi hanya bisa diakses pengurus yang login. Ulang tahun disimpan tanpa tahun supaya tidak terlalu sensitif kalau bocor |
+| **Privasi** | Data pribadi hanya bisa diakses pengurus yang login, kecuali isian terakhir yang tersimpan di perangkat peserta sendiri. Ulang tahun disimpan tanpa tahun supaya tidak terlalu sensitif kalau bocor |
 | **Kapasitas** | Mampu melayani ratusan peserta yang mengisi di menit yang sama. Batas teoretisnya sekitar 100 presensi per detik (batas Atlas gratis); di atas itu request antre, bukan gagal |
 | **Ketersediaan** | Vercel (paket Hobby, region Singapura) dan MongoDB Atlas (gratis). Cron mingguan memanggil `/api/health` supaya Atlas tidak di-pause saat libur |
 | **Kualitas** | Tes otomatis (`npm test` di folder `server`) mengecek validasi data dan batas hari WIB |
@@ -136,6 +137,7 @@ Akun admin pertama dibuat otomatis dari environment variable saat aplikasi perta
 |---|---|---|
 | Daftar kehadiran menampilkan maksimal 1.000 data terbaru per filter | Data lama di tampilan "Semua tanggal" tidak terlihat. Dashboard memberi tahu saat batas ini tercapai | Pilih tanggal tertentu, atau tambahkan paginasi di server |
 | Tidak ada batas per perangkat | "Titip absen" (mengisi presensi untuk orang lain) bisa terjadi | Lihat pertanyaan terbuka no. 2 |
+| Isian terakhir tersimpan di perangkat | Di HP yang dipakai bergantian, orang berikutnya melihat data orang sebelumnya (termasuk nomor WhatsApp) sampai menekan "Bukan kamu? Kosongkan" | Ingatkan peserta saat meminjamkan HP |
 | Form presensi tidak dibatasi per IP, karena peserta di Wi-Fi kampus memakai IP yang sama | Skrip bisa membanjiri form dengan data palsu | Aktifkan Vercel BotID untuk `POST /api/attendance` |
 | Tidak ada ekspor data atau riwayat penghapusan | Data yang dihapus pengurus tidak bisa dikembalikan | Tambahkan kalau dibutuhkan |
 

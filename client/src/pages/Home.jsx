@@ -23,6 +23,11 @@ const FIELDS = [
 // (Bukan maxLength: maxLength memotong teks tempelan seperti "0812 3456 7890" sebelum spasinya dibuang.)
 const DIGITS = { npm: 8, whatsapp: 13 };
 const EMPTY = { nama: '', npm: '', kelas: '', kakakKomsel: '', whatsapp: '', instagram: '', asalGereja: '', sumberInfo: '', lahirHari: '', lahirBulan: '' };
+// Isian terakhir disimpan di perangkat ini supaya presensi berikutnya tinggal dicek lalu dikirim (dukungan doa tidak ikut)
+const KEY = 'isianTerakhir';
+function remembered() {
+  try { return JSON.parse(localStorage.getItem(KEY)); } catch { return null; } // storage diblokir atau isinya rusak
+}
 const HARI = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'));
 const BULAN = Array.from({ length: 12 }, (_, i) => new Date(2000, i, 1).toLocaleDateString('id-ID', { month: 'long' }));
 
@@ -145,7 +150,8 @@ function Thanks({ nama, sent, onDone }) {
 }
 
 export default function Home() {
-  const [form, setForm] = useState(EMPTY);
+  const [form, setForm] = useState(() => ({ ...EMPTY, ...remembered() }));
+  const [prefilled, setPrefilled] = useState(() => !!remembered());
   const [submitted, setSubmitted] = useState(null); // presensi yang baru tercatat → tampilkan kolom dukungan doa
   const [thanks, setThanks] = useState(null); // { nama, sent } → layar terima kasih
   const [errors, setErrors] = useState({});
@@ -183,12 +189,22 @@ export default function Home() {
       const { lahirHari, lahirBulan, ...rest } = form;
       const doc = await api('/attendance', { method: 'POST', body: { ...rest, ulangTahun: lahirHari ? `${lahirBulan}-${lahirHari}` : undefined } });
       setSubmitted({ id: doc._id, npm: doc.npm, nama: doc.nama });
+      try { localStorage.setItem(KEY, JSON.stringify(form)); } catch { /* storage diblokir */ }
       setForm(EMPTY);
     } catch (err) {
       setStatus({ type: 'error', msg: err.message });
     } finally {
       setLoading(false);
     }
+  }
+
+  // Untuk HP yang dipakai bergantian: orang berikutnya menghapus isian orang sebelumnya
+  function forget() {
+    try { localStorage.removeItem(KEY); } catch { /* storage diblokir */ }
+    setForm(EMPTY);
+    setErrors({});
+    setPrefilled(false);
+    document.getElementById('nama').focus(); // tombolnya hilang setelah diklik, jadi fokus dipindah ke kolom pertama
   }
 
   return (
@@ -219,6 +235,12 @@ export default function Home() {
           className="animate-enter mt-8 space-y-4 rounded-2xl border-t-4 border-gold-400 bg-white p-5 shadow-sm ring-1 ring-stone-200 sm:p-6"
           style={{ animationDelay: '120ms' }}
         >
+          {prefilled && (
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-brown-50 px-3 py-2.5 text-sm text-brown-800 ring-1 ring-brown-100">
+              <p>Form terisi dari presensimu sebelumnya. Cek lagi, lalu kirim.</p>
+              <button type="button" onClick={forget} className={`${btnGhost} bg-white`}>Bukan kamu? Kosongkan</button>
+            </div>
+          )}
           {FIELDS.map(({ optional, wajib, ...f }) => (
             <Field key={f.name} id={f.name} {...f} value={form[f.name]} error={errors[f.name]} onChange={onChange} />
           ))}
@@ -249,6 +271,7 @@ export default function Home() {
           </div>
           <p className="text-xs text-stone-500">
             Data ini hanya digunakan untuk pelayanan Persekutuan Doa Universitas Gunadarma dan hanya dapat dilihat oleh pengurus.
+            Isianmu juga disimpan di perangkat ini supaya presensi berikutnya terisi otomatis.
           </p>
           <Alert type={status?.type}>{status?.msg}</Alert>
           <button type="submit" disabled={loading} className={`${btnPrimary} w-full`}>
